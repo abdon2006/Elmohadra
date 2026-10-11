@@ -47,6 +47,7 @@ dependencies:
   flutter_secure_storage: ^11.2.0
   flutter_screenutil: ^5.9.3
   flutter_launcher_icons: ^0.14.4
+  google_fonts: ^9.0.0
 
 dev_dependencies:
   flutter_test:
