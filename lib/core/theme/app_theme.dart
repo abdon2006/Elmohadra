@@ -37,8 +37,6 @@ class AppTheme {
       actionsIconTheme: const IconThemeData(color: AppColors.accent),
       titleTextStyle: AppTypography.screenTitle(context),
     ),
-    // TODO: inputDecorationTheme — custom widget
-    // TODO: bottomNavigationBarTheme — custom widget
   );
 
   static ThemeData light(BuildContext context) => ThemeData(
@@ -74,7 +72,5 @@ class AppTheme {
       actionsIconTheme: const IconThemeData(color: AppColors.accent),
       titleTextStyle: AppTypography.screenTitle(context),
     ),
-    // TODO: inputDecorationTheme — custom widget
-    // TODO: bottomNavigationBarTheme — custom widget
   );
 }

@@ -22,7 +22,7 @@ void main() async {
   runApp(
     EasyLocalization(
       supportedLocales: [Locale('en'), Locale('ar')],
-      path: 'assets/translations/',
+      path: 'assets/translations',
       child: MultiBlocProvider(
         providers: [
           BlocProvider(create: (context) => getIt<LocaleCubit>()),

@@ -1,1 +1,9 @@
-{}
+{
+  "nav": {
+    "home": "Home",
+    "battles": "Battles",
+    "subjects": "Subjects",
+    "friends": "Friends",
+    "profile": "Profile"
+  }
+}
