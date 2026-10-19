@@ -23,15 +23,19 @@ import '../../features/auth/data/repositories/auth_repository_impl.dart'
     as _i153;
 import '../../features/auth/domain/repositories/repositories/auth_repository.dart'
     as _i37;
+import '../../features/auth/domain/usecases/get_current_user_usecase.dart'
+    as _i17;
 import '../../features/auth/domain/usecases/get_user_by_id_usecase.dart'
     as _i15;
 import '../../features/auth/domain/usecases/handle_signing_with_google_usecase.dart'
-    as _i470;
+    as _i367;
 import '../../features/auth/domain/usecases/signin_with_email_usecase.dart'
     as _i240;
 import '../../features/auth/domain/usecases/signout_usecase.dart' as _i612;
 import '../../features/auth/domain/usecases/signup_with_email_usecase.dart'
     as _i397;
+import '../../features/auth/presentation/blocs/Auth%20Bloc/bloc/auth_bloc.dart'
+    as _i833;
 import '../localization/locale_cubit.dart' as _i960;
 import '../theme/theme_cubit.dart' as _i611;
 import 'register_module.dart' as _i291;
@@ -65,11 +69,15 @@ extension GetItInjectableX on _i174.GetIt {
         authRemoteDataSource: gh<_i107.AuthRemoteDataSource>(),
       ),
     );
+    gh.factory<_i17.GetCurrentUserUsecase>(
+      () =>
+          _i17.GetCurrentUserUsecase(authRepository: gh<_i37.AuthRepository>()),
+    );
     gh.factory<_i15.GetUserByIdUsecase>(
       () => _i15.GetUserByIdUsecase(authRepository: gh<_i37.AuthRepository>()),
     );
-    gh.factory<_i470.HandleSigningWithGoogleUsecase>(
-      () => _i470.HandleSigningWithGoogleUsecase(
+    gh.factory<_i367.HandleSigningWithGoogleUsecase>(
+      () => _i367.HandleSigningWithGoogleUsecase(
         authRepository: gh<_i37.AuthRepository>(),
       ),
     );
@@ -84,6 +92,14 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i397.SignupWithEmailUsecase>(
       () => _i397.SignupWithEmailUsecase(
         authRepository: gh<_i37.AuthRepository>(),
+      ),
+    );
+    gh.factory<_i833.AuthBloc>(
+      () => _i833.AuthBloc(
+        getCurrentUserUsecase: gh<_i17.GetCurrentUserUsecase>(),
+        handleSigningWithGoogleUsecase:
+            gh<_i367.HandleSigningWithGoogleUsecase>(),
+        signoutUsecase: gh<_i612.SignoutUsecase>(),
       ),
     );
     return this;

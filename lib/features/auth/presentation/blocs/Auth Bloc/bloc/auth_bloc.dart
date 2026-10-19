@@ -23,11 +23,11 @@ class AuthBloc extends Bloc<AuthEvents, AuthStates> {
       emit(AuthLoading());
 
       final res = await getCurrentUserUsecase(NoParams());
-      res.fold((failure) => emit(AuthUnAuthinticated()), (success) {
+      res.fold((failure) => emit(AuthUnAuthenticated()), (success) {
         if (success.existingUser != null) {
           emit(AuthAuthenticated(user: success.existingUser!));
         } else {
-          emit(AuthUnAuthinticated());
+          emit(AuthUnAuthenticated());
         }
       });
     });
@@ -36,7 +36,7 @@ class AuthBloc extends Bloc<AuthEvents, AuthStates> {
       emit(AuthLoading());
 
       final res = await getCurrentUserUsecase(NoParams());
-      res.fold((failure) => emit(AuthUnAuthinticated()), (success) {
+      res.fold((failure) => emit(AuthUnAuthenticated()), (success) {
         if (success.existingUser != null) {
           emit(AuthAuthenticated(user: success.existingUser!));
         } else {
@@ -67,7 +67,7 @@ class AuthBloc extends Bloc<AuthEvents, AuthStates> {
       res.fold((failure) => emit(AuthError(message: failure.message)), (
         success,
       ) {
-        emit(AuthUnAuthinticated());
+        emit(AuthUnAuthenticated());
       });
     });
   }

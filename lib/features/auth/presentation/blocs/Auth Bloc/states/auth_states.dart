@@ -2,7 +2,7 @@ import 'package:elmohadra/features/auth/domain/entities/auth_user_result.dart';
 import 'package:elmohadra/features/auth/domain/entities/user_entity.dart';
 import 'package:equatable/equatable.dart';
 
-abstract class AuthStates extends Equatable {}
+sealed class AuthStates extends Equatable {}
 
 class AuthInitial extends AuthStates {
   @override
@@ -38,7 +38,7 @@ class AuthNewUser extends AuthStates {
   List<Object?> get props => [user];
 }
 
-class AuthUnAuthinticated extends AuthStates {
+class AuthUnAuthenticated extends AuthStates {
   @override
   List<Object?> get props => [];
 }
