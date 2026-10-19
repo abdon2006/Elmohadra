@@ -1,0 +1,330 @@
+7 - Database – Tables & Relationships
+Version 1.0.0
+Users
+
+
+id
+name
+nickname
+email
+password_hash
+university
+academic_year
+level
+xp
+total_battles
+won_battles
+defeat_battles
+draw_battles
+coins
+avatar_key
+created_at
+status
+
+questions
+id
+content
+choices
+answer
+type
+subject_id
+time
+source
+status
+
+
+
+
+
+
+
+Files
+
+
+
+id
+boss_id
+file_title
+file_source
+battle_count
+created_at
+
+
+
+
+
+file_questions
+
+
+
+
+
+
+
+id 
+file_id 
+question_id 
+order
+
+
+
+
+subjects
+
+
+id
+title
+academic_year
+college_id
+created_at
+
+
+
+Battle
+
+
+
+id
+player1_id
+player2_id
+file_id
+status
+type
+total_xp
+player1_xp
+player2_xp
+created_by
+created_at
+
+
+
+
+
+
+
+
+
+
+Battle_answers
+
+
+
+id
+battle_id
+user_id
+question_id
+chosen_answer
+time_taken
+is_correct
+
+
+
+friendships
+id
+sender_id
+receiver_id
+status
+created_at
+
+
+
+store_i
+t
+ems
+id
+
+
+
+category_id
+item_title
+type
+price
+is_available
+Created_at
+
+
+store_categori
+e
+s
+id
+name 
+created_at
+
+
+
+
+
+user_purchases
+
+
+
+id
+user_id
+item_id
+purchase_price
+created_at
+
+
+
+
+
+Battle Rooms
+
+id 
+file_id 
+created_by 
+status → (waiting / active / finished) 
+invite_code 
+created_at
+
+
+
+
+
+
+Bosses
+id
+
+
+
+
+subject_id 
+title 
+stages_count 
+win_condition_percentage
+created_at
+
+
+
+
+colleges 
+
+
+id 
+name 
+Created_at
+
+
+xp_history 
+
+
+id 
+user_id 
+source_type → (battle / boss) 
+
+
+
+
+source_id 
+xp_earned 
+created_at
+
+
+
+
+
+coi
+n
+s_hi
+s
+tory
+id
+
+
+
+user_id 
+source_type → (battle / boss) 
+source_id 
+coins_earned 
+earned_at
+
+
+
+
+boss_attempts 
+
+
+id 
+user_id 
+boss_id 
+score_percentage status → (won / lost) 
+xp_earned 
+created_at
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Relationships
+
+: users --- friendships
+  يوزر واحد ممكن يلعب باتلز كتير:users --- battle
+  يوزر واحد ممكن يجاوب أسئلة كتير: users --- battle_answers
+  كتيرitems  يوزر واحد ممكن يشتري: users --- user_purchases
+ كتير (مراحل) مfiles  واحد فيهbosses --- files : boss
+مل واح ممكن يتعم عليه باتل  ز: e lttba- -) files
+باتل واحد فيها جابا  ت:  rswens_aelt
+battle --- bat
+واح ممكن اش من يوزر  زm eit: s sea
+store_items --- user_purch
+سؤا واح ممكن تج في باتل  ز:  rswens_aelt
+questions --- bat
+ms  oo rمل
+يوز واح ممك:  msoo_rletta
+users --- b
+XP 
+يوز واح عن:  rytois_hpx
+users --ns  oi cجل
+يوز واح عن:  rytois_hsni
+users --- co
+es  ssbo
+يوز واح ممكن يحاو:  tsmpteat_ss
+users --- bo
+كلية واحد فيه موا  د:  tsecbjsu -colleges es  ssbo
+مادة واحد ممك:  esssbo- -subjects
+واح ممكن تحاو هزم مرا  تs sbo: s ptm
+bosses --- boss_atte
+  وlettba
+ واحدةomro: s let
+battle_rooms --- bat
+ms  te iها
+ واحدrygoteca: 
+store_categories --- store_items
+ يوزر واحد ممكن يبعت أو يستقبل طلبات كتير
+
+مادة واحد فيها أسئل  ة:  nsiostueq -
+
+فيه أسئل  ة
+
+e il fفي
+
+واe lfi: s oni
+سؤا واح ممك ي:  nsiostueq e
+
+_
+
+subjects --
+
+_ uest
+
+files --- file q
+
+questions --- fil
+

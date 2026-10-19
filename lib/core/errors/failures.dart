@@ -12,6 +12,10 @@ class ServerFailure extends Failure {
   const ServerFailure({required super.message});
 }
 
+class NetworkFailure extends Failure {
+  const NetworkFailure({required super.message});
+}
+
 class LocalFailure extends Failure {
   const LocalFailure({required super.message});
 }

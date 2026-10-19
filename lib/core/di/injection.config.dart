@@ -13,7 +13,23 @@
 import 'package:get_it/get_it.dart' as _i174;
 import 'package:injectable/injectable.dart' as _i526;
 import 'package:shared_preferences/shared_preferences.dart' as _i460;
+import 'package:supabase_flutter/supabase_flutter.dart' as _i454;
 
+import '../../features/auth/data/datasources/auth_remote_data_source.dart'
+    as _i107;
+import '../../features/auth/data/datasources/auth_remote_data_source_impl.dart'
+    as _i123;
+import '../../features/auth/data/repositories/auth_repository_impl.dart'
+    as _i153;
+import '../../features/auth/domain/repositories/repositories/auth_repository.dart'
+    as _i37;
+import '../../features/auth/domain/usecases/handle_signing_with_google.dart'
+    as _i470;
+import '../../features/auth/domain/usecases/signin_with_email_usecase.dart'
+    as _i240;
+import '../../features/auth/domain/usecases/signout_usecase.dart' as _i612;
+import '../../features/auth/domain/usecases/signup_with_email_usecase.dart'
+    as _i397;
 import '../localization/locale_cubit.dart' as _i960;
 import '../theme/theme_cubit.dart' as _i611;
 import 'register_module.dart' as _i291;
@@ -30,11 +46,40 @@ extension GetItInjectableX on _i174.GetIt {
       () => registerModule.sharedPreferences,
       preResolve: true,
     );
+    gh.lazySingleton<_i454.SupabaseClient>(() => registerModule.supabaseClient);
+    gh.lazySingleton<_i107.AuthRemoteDataSource>(
+      () => _i123.AuthRemoteDataSourceImpl(
+        supabaseClient: gh<_i454.SupabaseClient>(),
+      ),
+    );
     gh.lazySingleton<_i960.LocaleCubit>(
       () => _i960.LocaleCubit(gh<_i460.SharedPreferences>()),
     );
     gh.lazySingleton<_i611.ThemeCubit>(
       () => _i611.ThemeCubit(gh<_i460.SharedPreferences>()),
+    );
+    gh.lazySingleton<_i37.AuthRepository>(
+      () => _i153.AuthRepositoryImpl(
+        authRemoteDataSource: gh<_i107.AuthRemoteDataSource>(),
+      ),
+    );
+    gh.factory<_i470.HandleSigningWithGoogle>(
+      () => _i470.HandleSigningWithGoogle(
+        authRepository: gh<_i37.AuthRepository>(),
+      ),
+    );
+    gh.factory<_i240.SigninWithEmailUsecase>(
+      () => _i240.SigninWithEmailUsecase(
+        authRepository: gh<_i37.AuthRepository>(),
+      ),
+    );
+    gh.factory<_i612.SignoutUsecase>(
+      () => _i612.SignoutUsecase(authRepository: gh<_i37.AuthRepository>()),
+    );
+    gh.factory<_i397.SignupWithEmailUsecase>(
+      () => _i397.SignupWithEmailUsecase(
+        authRepository: gh<_i37.AuthRepository>(),
+      ),
     );
     return this;
   }

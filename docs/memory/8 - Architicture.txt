@@ -1,0 +1,75 @@
+8 - Architiciture - Elmohadra
+Version 1.0.0
+Flutter (Android & iOS)
+Supabase (Backend as a Service)
+BLoC + Cubit (State Management)
+Clean Architecture (Feature-first)
+injectable + get_it (Dependency Injection)
+dartz - Either (Error Handling)
+easy_localization (Localization)
+Dark & Light Mode
+تقسيم المش
+
+روع
+lib/
+core/
+di/
+constants/
+theme/
+storage/w
+routing/
+supabase/
+localization/
+features/
+auth/
+user/
+battle/
+friendship/
+subjects/
+files/
+questions/
+store/
+
+
+
+
+feature تقسيم كل
+layers 3  بتتقسم لـfeature كل
+
+domain/
+
+entities/
+repositories/
+usecases/
+
+data/
+
+datasources/
+models/
+repositories/
+
+presentation/
+bloc/
+
+screens/
+widgets/
+
+Error Handling
+ dartz  منEither  بترجعrepositories كل الـ
+  واليمين البياناتFailure اليسار
+message  للـoverride  منها معsubclass  بيبقىerror  رئيسية وكل نوعFailure class في
+
+State Management
+ user وauth وbattle  الكبيرة زيfeatures  للـBloc
+language وtheme  للحاجات البسيطة زيCubit
+
+Localization
+  من أول يومeasy_localization
+ assets/translations  جوهJSON files
+ اإلنجليزي بيجي بعدينLlanguage JSON أول وArabic
+
+Theme
+ Light Mode  وDark Mode
+  بيتحكم في التبديل بينهمThemeCubit
+typography وradius وspacing وcolors  منcore/theme  محدد فيDesign System
+

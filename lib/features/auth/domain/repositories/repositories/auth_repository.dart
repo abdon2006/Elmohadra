@@ -5,8 +5,7 @@ import 'package:elmohadra/features/auth/domain/usecases/prams%20classes/signin_p
 import 'package:elmohadra/features/auth/domain/usecases/prams%20classes/signup_params.dart';
 
 abstract class AuthRepository {
-  Future<Either<Failure, UserEntity>> signInWithGoogle();
-  Future<Either<Failure, UserEntity>> signUpWithGoogle();
+  Future<Either<Failure, void>> handleSigningWithGoogle();
   Future<Either<Failure, UserEntity>> signInWithEmail(SigninParams params);
   Future<Either<Failure, UserEntity>> signUpWithEmail(SignupParams params);
   Future<Either<Failure, void>> signOut();
