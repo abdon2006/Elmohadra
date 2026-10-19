@@ -23,7 +23,9 @@ import '../../features/auth/data/repositories/auth_repository_impl.dart'
     as _i153;
 import '../../features/auth/domain/repositories/repositories/auth_repository.dart'
     as _i37;
-import '../../features/auth/domain/usecases/handle_signing_with_google.dart'
+import '../../features/auth/domain/usecases/get_user_by_id_usecase.dart'
+    as _i15;
+import '../../features/auth/domain/usecases/handle_signing_with_google_usecase.dart'
     as _i470;
 import '../../features/auth/domain/usecases/signin_with_email_usecase.dart'
     as _i240;
@@ -63,8 +65,11 @@ extension GetItInjectableX on _i174.GetIt {
         authRemoteDataSource: gh<_i107.AuthRemoteDataSource>(),
       ),
     );
-    gh.factory<_i470.HandleSigningWithGoogle>(
-      () => _i470.HandleSigningWithGoogle(
+    gh.factory<_i15.GetUserByIdUsecase>(
+      () => _i15.GetUserByIdUsecase(authRepository: gh<_i37.AuthRepository>()),
+    );
+    gh.factory<_i470.HandleSigningWithGoogleUsecase>(
+      () => _i470.HandleSigningWithGoogleUsecase(
         authRepository: gh<_i37.AuthRepository>(),
       ),
     );

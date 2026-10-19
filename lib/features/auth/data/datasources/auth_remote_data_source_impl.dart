@@ -5,7 +5,7 @@ import 'package:elmohadra/features/auth/domain/usecases/prams%20classes/signin_p
 import 'package:elmohadra/features/auth/domain/usecases/prams%20classes/signup_params.dart';
 import 'package:injectable/injectable.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-
+import 'package:elmohadra/features/auth/domain/entities/auth_user_result.dart';
 
 @LazySingleton(as: AuthRemoteDataSource)
 class AuthRemoteDataSourceImpl extends AuthRemoteDataSource {
@@ -88,6 +88,24 @@ class AuthRemoteDataSourceImpl extends AuthRemoteDataSource {
       return UserModel.fromJson(res[0]);
     } catch (e) {
       rethrow;
+    }
+  }
+
+  @override
+  Future<AuthUserResult> getCurrentUser() async {
+    final res = supabaseClient.auth.currentUser;
+    if (res != null) {
+      final List<Map<String, dynamic>> res2 = await supabaseClient
+          .from('users')
+          .select()
+          .eq('id', res.id);
+      if (res2.isEmpty) {
+        return AuthUserResult(newUserId: res.id, newUseremail: res.email);
+      } else {
+        return AuthUserResult(existingUser: UserModel.fromJson(res2[0]));
+      }
+    } else {
+      return AuthUserResult();
     }
   }
 }
