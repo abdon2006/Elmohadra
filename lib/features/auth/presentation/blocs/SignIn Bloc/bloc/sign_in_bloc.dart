@@ -14,7 +14,7 @@ class SignInBloc extends Bloc<SignInBlocEvents, SignInBlocStates> {
       emit(SigninBlocLoading());
       final res = await signinWithEmailUsecase(event.params);
       res.fold(
-        (l) => emit(SigninBlocError(message: l.message)),
+        (l) => emit(SigninBlocError(message: l.message, failure: l)),
         (r) => emit(SigninBlocSuccess(user: r)),
       );
     });

@@ -1,6 +1,8 @@
 import 'package:elmohadra/features/auth/domain/entities/user_entity.dart';
 import 'package:equatable/equatable.dart';
 
+import '../../../../../../core/errors/failures.dart';
+
 sealed class SignInBlocStates extends Equatable {}
 
 class SigninBlocInitial extends SignInBlocStates {
@@ -15,13 +17,17 @@ class SigninBlocLoading extends SignInBlocStates {
 
 class SigninBlocError extends SignInBlocStates {
   final String message;
-  SigninBlocError({required this.message});
+  final Failure failure;
+
+  SigninBlocError({required this.message, required this.failure});
+
   @override
   List<Object?> get props => [message];
 }
 
 class SigninBlocSuccess extends SignInBlocStates {
   final UserEntity user;
+
   SigninBlocSuccess({required this.user});
 
   @override

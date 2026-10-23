@@ -1,10 +1,12 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:elmohadra/core/constants/app_assets.dart';
+import 'package:elmohadra/core/errors/app_error_mapper.dart';
 import 'package:elmohadra/core/localization/locale_cubit.dart';
 import 'package:elmohadra/core/theme/app_colors.dart';
 import 'package:elmohadra/core/theme/app_spacing.dart';
 import 'package:elmohadra/core/theme/app_typography.dart';
 import 'package:elmohadra/core/widgets/app_text_field.dart';
+import 'package:elmohadra/core/widgets/app_toast.dart';
 import 'package:elmohadra/features/auth/domain/usecases/prams%20classes/signin_params.dart';
 import 'package:elmohadra/features/auth/presentation/blocs/SignIn%20Bloc/bloc/sign_in_bloc.dart';
 import 'package:elmohadra/features/auth/presentation/blocs/SignIn%20Bloc/events/sign_in_events.dart';
@@ -56,8 +58,34 @@ class _SignInScreenState extends State<SignInScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 SizedBox(height: AppSpacing.sm.h),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "sign_in".tr(),
+                      style: AppTypography.screenTitle(context),
+                    ),
+                    Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        onTap: () =>
+                            context.read<LocaleCubit>().toggle(context),
+                        splashColor: AppColors.accent.withValues(alpha: 0.08),
 
-
+                        customBorder: CircleBorder(),
+                        child: Ink(
+                          padding: EdgeInsets.all(AppSpacing.sm),
+                          decoration: BoxDecoration(shape: BoxShape.circle),
+                          child: Center(
+                            child: HugeIcon(
+                              icon: HugeIcons.strokeRoundedTranslation,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
                 Divider(
                   color: isDark
                       ? AppColors.darkDivider
@@ -118,7 +146,17 @@ class _SignInScreenState extends State<SignInScreen> {
                 ),
                 SizedBox(height: AppSpacing.sm.h),
 
-                BlocBuilder<SignInBloc, SignInBlocStates>(
+                BlocConsumer<SignInBloc, SignInBlocStates>(
+                  listener: (context, state) {
+                    if (state is SigninBlocError) {
+                      AppToast.show(
+                        context: context,
+                        title: AppErrorMapper.toKey(state.failure).tr(),
+                        description: 'شسمنانمشسالنشالن',
+                        type: AppToastType.error,
+                      );
+                    }
+                  },
                   builder: (context, state) {
                     return AppButton(
                       title: 'enter_now'.tr(),

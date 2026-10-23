@@ -4,6 +4,7 @@ abstract class Failure extends Equatable {
   final String message;
 
   const Failure({required this.message});
+
   @override
   List<Object?> get props => [message];
 }
@@ -29,7 +30,9 @@ class BattleFailure extends Failure {
 }
 
 class AuthFailure extends Failure {
-  const AuthFailure({required super.message});
+  final String code;
+
+  const AuthFailure({required super.message, required this.code});
 }
 
 class CacheFailure extends Failure {

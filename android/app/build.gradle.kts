@@ -27,7 +27,10 @@ android {
         // flag during build.
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        multiDexEnabled = true
+
     }
+
 
     buildTypes {
         release {
@@ -36,6 +39,9 @@ android {
             signingConfig = signingConfigs.getByName("debug")
         }
     }
+}
+dependencies {
+    implementation("androidx.multidex:multidex:2.0.1")
 }
 
 kotlin {

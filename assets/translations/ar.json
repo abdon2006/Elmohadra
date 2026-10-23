@@ -10,5 +10,14 @@
   "enter_now": "دخول الساحة",
   "sign_in_google": "تسجيل بجوجل ",
   "dont_have_account": "لسه جديد؟ ",
-  "create_one": "انشئ حساب"
+  "create_one": "انشئ حساب",
+  "errors": {
+    "network": "تحقق من اتصالك بالإنترنت",
+    "unknown": "حدث خطأ، حاول مرة أخرى",
+    "auth": {
+      "invalid_credentials": "البريد الإلكتروني أو كلمة المرور غلط",
+      "email_not_confirmed": "لم يتم تأكيد البريد الإلكتروني",
+      "user_not_found": "الحساب غير موجود"
+    }
+  }
 }

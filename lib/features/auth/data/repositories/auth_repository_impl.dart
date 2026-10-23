@@ -24,7 +24,9 @@ class AuthRepositoryImpl extends AuthRepository {
       return Right(res);
     } catch (e) {
       return switch (e) {
-        AuthException() => Left(AuthFailure(message: e.toString())),
+        AuthException() => Left(
+          AuthFailure(message: e.toString(), code: e.code ?? "Unknown"),
+        ),
         PostgrestException() => Left(ServerFailure(message: e.toString())),
         SocketException() => Left(NetworkFailure(message: e.toString())),
         _ => Left(ServerFailure(message: e.toString())),
@@ -41,7 +43,9 @@ class AuthRepositoryImpl extends AuthRepository {
       return Right(res);
     } catch (e) {
       return switch (e) {
-        AuthException() => Left(AuthFailure(message: e.toString())),
+        AuthException() => Left(
+          AuthFailure(message: e.toString(), code: e.code ?? "Unknown"),
+        ),
         PostgrestException() => Left(ServerFailure(message: e.toString())),
         SocketException() => Left(NetworkFailure(message: e.toString())),
         _ => Left(ServerFailure(message: e.toString())),
@@ -56,7 +60,9 @@ class AuthRepositoryImpl extends AuthRepository {
       return Right(res);
     } catch (e) {
       return switch (e) {
-        AuthException() => Left(AuthFailure(message: e.toString())),
+        AuthException() => Left(
+          AuthFailure(message: e.toString(), code: e.code ?? "Unknown"),
+        ),
         PostgrestException() => Left(ServerFailure(message: e.toString())),
         SocketException() => Left(NetworkFailure(message: e.toString())),
         _ => Left(ServerFailure(message: e.toString())),
@@ -73,7 +79,9 @@ class AuthRepositoryImpl extends AuthRepository {
       return Right(res);
     } catch (e) {
       return switch (e) {
-        AuthException() => Left(AuthFailure(message: e.toString())),
+        AuthException() => Left(
+          AuthFailure(message: e.toString(), code: e.code ?? "Unknown"),
+        ),
         PostgrestException() => Left(ServerFailure(message: e.toString())),
         SocketException() => Left(NetworkFailure(message: e.toString())),
         _ => Left(ServerFailure(message: e.toString())),
@@ -88,7 +96,9 @@ class AuthRepositoryImpl extends AuthRepository {
       return Right(res);
     } catch (e) {
       return switch (e) {
-        AuthException() => Left(AuthFailure(message: e.toString())),
+        AuthException() => Left(
+          AuthFailure(message: e.toString(), code: e.code ?? "Unknown"),
+        ),
         PostgrestException() => Left(ServerFailure(message: e.toString())),
         SocketException() => Left(NetworkFailure(message: e.toString())),
         _ => Left(ServerFailure(message: e.toString())),
@@ -106,7 +116,9 @@ class AuthRepositoryImpl extends AuthRepository {
         " ------------- catching error i getCurrent USer in AuthRepo Impl : ${e.toString()} -------",
       );
       return switch (e) {
-        AuthException() => Left(AuthFailure(message: e.toString())),
+        AuthException() => Left(
+          AuthFailure(message: e.toString(), code: e.code ?? "Unknown"),
+        ),
         PostgrestException() => Left(ServerFailure(message: e.toString())),
         SocketException() => Left(NetworkFailure(message: e.toString())),
         _ => Left(ServerFailure(message: e.toString())),
