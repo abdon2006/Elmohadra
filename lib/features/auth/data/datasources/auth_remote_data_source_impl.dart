@@ -1,15 +1,16 @@
 import 'package:elmohadra/features/auth/data/datasources/auth_remote_data_source.dart';
 import 'package:elmohadra/features/auth/data/models/user_model.dart';
+import 'package:elmohadra/features/auth/domain/entities/auth_user_result.dart';
 import 'package:elmohadra/features/auth/domain/entities/user_entity.dart';
 import 'package:elmohadra/features/auth/domain/usecases/prams%20classes/signin_params.dart';
 import 'package:elmohadra/features/auth/domain/usecases/prams%20classes/signup_params.dart';
 import 'package:injectable/injectable.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:elmohadra/features/auth/domain/entities/auth_user_result.dart';
 
 @LazySingleton(as: AuthRemoteDataSource)
 class AuthRemoteDataSourceImpl extends AuthRemoteDataSource {
   final SupabaseClient supabaseClient;
+
   AuthRemoteDataSourceImpl({required this.supabaseClient});
 
   @override
@@ -95,16 +96,30 @@ class AuthRemoteDataSourceImpl extends AuthRemoteDataSource {
   Future<AuthUserResult> getCurrentUser() async {
     final res = supabaseClient.auth.currentUser;
     if (res != null) {
+      print(
+        '----------- found user signed in (getCurrent user impl in datasource : res1) -------------',
+      );
       final List<Map<String, dynamic>> res2 = await supabaseClient
           .from('users')
           .select()
           .eq('id', res.id);
+
       if (res2.isEmpty) {
+        print(
+          '----------- the user isn\'t in the database  (getCurrent user impl in datasource ) -------------',
+        );
+
         return AuthUserResult(newUserId: res.id, newUseremail: res.email);
       } else {
+        print(
+          '----------- found user in database (getCurrent user impl in datasource : res2) -------------',
+        );
         return AuthUserResult(existingUser: UserModel.fromJson(res2[0]));
       }
     } else {
+      print(
+        '----------- returning empty AuthUserResult (getCurrent user impl in datasource ) -------------',
+      );
       return AuthUserResult();
     }
   }

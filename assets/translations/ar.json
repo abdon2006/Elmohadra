@@ -1,9 +1,14 @@
 {
-  "nav": {
-    "home": "الرئيسية",
-    "battles": "المعارك",
-    "subjects": "المواد",
-    "friends": "الأصدقاء",
-    "profile": "الملف"
-  }
+  "sign_in": "تسجيل الدخول",
+  "battle_continues": "المعركة لسه مكملة!",
+  "battle_subtitle": "ارجع لتحدياتك، وكمل طريقك للقمة.",
+  "email_label": "البريد الالكتروني",
+  "email_hint": "ادخل البريد الالكتروني",
+  "password_label": "كلمة المرور",
+  "password_hint": "••••••••",
+  "forgot_password": "نسيت كلمة المرور؟",
+  "enter_now": "دخول الساحة",
+  "sign_in_google": "تسجيل بجوجل ",
+  "dont_have_account": "لسه جديد؟ ",
+  "create_one": "انشئ حساب"
 }

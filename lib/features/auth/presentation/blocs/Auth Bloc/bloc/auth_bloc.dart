@@ -26,6 +26,8 @@ class AuthBloc extends Bloc<AuthEvents, AuthStates> {
       res.fold((failure) => emit(AuthUnAuthenticated()), (success) {
         if (success.existingUser != null) {
           emit(AuthAuthenticated(user: success.existingUser!));
+        } else if (success.newUserId != null) {
+          emit(AuthNewUser(user: success));
         } else {
           emit(AuthUnAuthenticated());
         }
@@ -51,7 +53,7 @@ class AuthBloc extends Bloc<AuthEvents, AuthStates> {
         }
       });
     });
-    
+
     on<HandleSigningWithGoogleEvent>((event, emit) async {
       emit(AuthLoading());
       final res = await handleSigningWithGoogleUsecase(NoParams());

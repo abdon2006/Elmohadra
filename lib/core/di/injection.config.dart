@@ -21,7 +21,7 @@ import '../../features/auth/data/datasources/auth_remote_data_source_impl.dart'
     as _i123;
 import '../../features/auth/data/repositories/auth_repository_impl.dart'
     as _i153;
-import '../../features/auth/domain/repositories/repositories/auth_repository.dart'
+import '../../features/auth/domain/repositories/auth_repository.dart'
     as _i37;
 import '../../features/auth/domain/usecases/get_current_user_usecase.dart'
     as _i17;

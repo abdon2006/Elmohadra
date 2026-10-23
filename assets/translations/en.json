@@ -1,9 +1,14 @@
 {
-  "nav": {
-    "home": "Home",
-    "battles": "Battles",
-    "subjects": "Subjects",
-    "friends": "Friends",
-    "profile": "Profile"
-  }
+  "sign_in": "Sign in",
+  "battle_continues": "The battle continues",
+  "battle_subtitle": "Resume your study journey and unlock new achievements.",
+  "email_label": "Email",
+  "email_hint": "Enter your email",
+  "password_label": "Password",
+  "password_hint": "••••••••",
+  "forgot_password": "Forgot password?",
+  "enter_now": "Enter Now",
+  "sign_in_google": "Sign in With Google",
+  "dont_have_account": "Don't have an account? ",
+  "create_one": "Create One"
 }

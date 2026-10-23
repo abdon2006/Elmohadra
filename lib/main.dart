@@ -1,4 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:elmohadra/core/constants/app_bloc_observer.dart';
+import 'package:elmohadra/core/di/injection.dart';
 import 'package:elmohadra/core/localization/locale_cubit.dart';
 import 'package:elmohadra/core/routing/app_router.dart';
 import 'package:elmohadra/core/supabase/supabase_config.dart';
@@ -6,10 +8,10 @@ import 'package:elmohadra/core/theme/app_theme.dart';
 import 'package:elmohadra/core/theme/theme_cubit.dart';
 import 'package:elmohadra/features/auth/presentation/blocs/Auth%20Bloc/bloc/auth_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:elmohadra/core/di/injection.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,6 +20,10 @@ void main() async {
     url: SupabaseConfig.supabaseUrl,
     publishableKey: SupabaseConfig.supabasePublishableKey,
   );
+  SystemChrome.setSystemUIOverlayStyle(
+    SystemUiOverlayStyle(statusBarColor: Colors.transparent),
+  );
+  Bloc.observer = AppBlocObserver();
   await EasyLocalization.ensureInitialized();
   await configureDependencies();
   runApp(

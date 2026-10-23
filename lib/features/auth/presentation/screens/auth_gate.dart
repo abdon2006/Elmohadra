@@ -4,6 +4,9 @@ import 'package:app_links/app_links.dart';
 import 'package:elmohadra/features/auth/presentation/blocs/Auth%20Bloc/bloc/auth_bloc.dart';
 import 'package:elmohadra/features/auth/presentation/blocs/Auth%20Bloc/events/auth_events.dart';
 import 'package:elmohadra/features/auth/presentation/blocs/Auth%20Bloc/states/auth_states.dart';
+import 'package:elmohadra/features/auth/presentation/screens/complete_profile_screen.dart';
+import 'package:elmohadra/features/auth/presentation/screens/home_screen.dart';
+import 'package:elmohadra/features/auth/presentation/screens/sign_in_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -17,6 +20,7 @@ class AuthGate extends StatefulWidget {
 class _AuthGateState extends State<AuthGate> {
   late AppLinks appLinks;
   late StreamSubscription<Uri> appLinksListener;
+
   @override
   void initState() {
     context.read<AuthBloc>().add(CheckAuthStatusEvent());
@@ -37,15 +41,13 @@ class _AuthGateState extends State<AuthGate> {
   Widget build(BuildContext context) {
     return BlocBuilder<AuthBloc, AuthStates>(
       builder: (context, state) {
-        // return switch (state) {
-        //   AuthAuthenticated(:final user) => HomeScreen(),
-        //   AuthNewUser(:final user) => CompleteProfileScreen(),
-        //   AuthUnAuthenticated() => LoginScreen(),
-        //   AuthInitial() || AuthLoading() => CircularProgressIndicator(),
-        //   AuthError() => LoginScreen(),
-        // };
-        // temp
-        return SizedBox();
+        return switch (state) {
+          AuthAuthenticated(:final user) => HomeScreen(),
+          AuthNewUser(:final user) => CompleteProfileScreen(),
+          AuthUnAuthenticated() => SignInScreen(),
+          AuthInitial() || AuthLoading() => CircularProgressIndicator(),
+          AuthError() => SignInScreen(),
+        };
       },
     );
   }
