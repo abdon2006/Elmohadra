@@ -21,8 +21,7 @@ import '../../features/auth/data/datasources/auth_remote_data_source_impl.dart'
     as _i123;
 import '../../features/auth/data/repositories/auth_repository_impl.dart'
     as _i153;
-import '../../features/auth/domain/repositories/auth_repository.dart'
-    as _i37;
+import '../../features/auth/domain/repositories/auth_repository.dart' as _i787;
 import '../../features/auth/domain/usecases/get_current_user_usecase.dart'
     as _i17;
 import '../../features/auth/domain/usecases/get_user_by_id_usecase.dart'
@@ -36,6 +35,10 @@ import '../../features/auth/domain/usecases/signup_with_email_usecase.dart'
     as _i397;
 import '../../features/auth/presentation/blocs/Auth%20Bloc/bloc/auth_bloc.dart'
     as _i833;
+import '../../features/auth/presentation/blocs/SignIn%20Bloc/bloc/sign_in_bloc.dart'
+    as _i519;
+import '../../features/auth/presentation/blocs/SignUp%20Bloc/bloc/sign_up_bloc.dart'
+    as _i128;
 import '../localization/locale_cubit.dart' as _i960;
 import '../theme/theme_cubit.dart' as _i611;
 import 'register_module.dart' as _i291;
@@ -64,42 +67,53 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i611.ThemeCubit>(
       () => _i611.ThemeCubit(gh<_i460.SharedPreferences>()),
     );
-    gh.lazySingleton<_i37.AuthRepository>(
+    gh.lazySingleton<_i787.AuthRepository>(
       () => _i153.AuthRepositoryImpl(
         authRemoteDataSource: gh<_i107.AuthRemoteDataSource>(),
       ),
     );
     gh.factory<_i17.GetCurrentUserUsecase>(
-      () =>
-          _i17.GetCurrentUserUsecase(authRepository: gh<_i37.AuthRepository>()),
+      () => _i17.GetCurrentUserUsecase(
+        authRepository: gh<_i787.AuthRepository>(),
+      ),
     );
     gh.factory<_i15.GetUserByIdUsecase>(
-      () => _i15.GetUserByIdUsecase(authRepository: gh<_i37.AuthRepository>()),
+      () => _i15.GetUserByIdUsecase(authRepository: gh<_i787.AuthRepository>()),
     );
     gh.factory<_i367.HandleSigningWithGoogleUsecase>(
       () => _i367.HandleSigningWithGoogleUsecase(
-        authRepository: gh<_i37.AuthRepository>(),
+        authRepository: gh<_i787.AuthRepository>(),
       ),
     );
     gh.factory<_i240.SigninWithEmailUsecase>(
       () => _i240.SigninWithEmailUsecase(
-        authRepository: gh<_i37.AuthRepository>(),
+        authRepository: gh<_i787.AuthRepository>(),
       ),
     );
     gh.factory<_i612.SignoutUsecase>(
-      () => _i612.SignoutUsecase(authRepository: gh<_i37.AuthRepository>()),
+      () => _i612.SignoutUsecase(authRepository: gh<_i787.AuthRepository>()),
     );
     gh.factory<_i397.SignupWithEmailUsecase>(
       () => _i397.SignupWithEmailUsecase(
-        authRepository: gh<_i37.AuthRepository>(),
+        authRepository: gh<_i787.AuthRepository>(),
       ),
     );
-    gh.factory<_i833.AuthBloc>(
+    gh.lazySingleton<_i833.AuthBloc>(
       () => _i833.AuthBloc(
         getCurrentUserUsecase: gh<_i17.GetCurrentUserUsecase>(),
         handleSigningWithGoogleUsecase:
             gh<_i367.HandleSigningWithGoogleUsecase>(),
         signoutUsecase: gh<_i612.SignoutUsecase>(),
+      ),
+    );
+    gh.factory<_i519.SignInBloc>(
+      () => _i519.SignInBloc(
+        signinWithEmailUsecase: gh<_i240.SigninWithEmailUsecase>(),
+      ),
+    );
+    gh.factory<_i128.SignUpBloc>(
+      () => _i128.SignUpBloc(
+        signupWithEmailUsecase: gh<_i397.SignupWithEmailUsecase>(),
       ),
     );
     return this;

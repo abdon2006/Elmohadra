@@ -16,6 +16,7 @@ class AuthLoading extends AuthStates {
 
 class AuthError extends AuthStates {
   final String message;
+
   AuthError({required this.message});
 
   @override
@@ -24,6 +25,7 @@ class AuthError extends AuthStates {
 
 class AuthAuthenticated extends AuthStates {
   final UserEntity user;
+
   AuthAuthenticated({required this.user});
 
   @override
@@ -32,6 +34,7 @@ class AuthAuthenticated extends AuthStates {
 
 class AuthNewUser extends AuthStates {
   final AuthUserResult user;
+
   AuthNewUser({required this.user});
 
   @override

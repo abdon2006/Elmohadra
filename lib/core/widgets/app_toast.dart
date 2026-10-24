@@ -12,7 +12,7 @@ class AppToast {
   static void show({
     required BuildContext context,
     required String title,
-    required String description,
+    String? description,
     required AppToastType type,
   }) {
     final (color, icon) = switch (type) {
@@ -48,13 +48,13 @@ class AppToast {
 
 class _AppToastWidget extends StatelessWidget {
   final String title;
-  final String description;
+  final String? description;
   final Color color;
   final List<List<dynamic>> icon;
 
   const _AppToastWidget({
     required this.title,
-    required this.description,
+    this.description,
     required this.color,
     required this.icon,
   });
@@ -90,11 +90,12 @@ class _AppToastWidget extends StatelessWidget {
               children: [
                 Text(title, style: AppTypography.cardTitle(context)),
                 SizedBox(height: 2.h),
-                Text(
-                  description,
-                  style: AppTypography.bodySmall(context)
-                      .copyWith(color: AppColors.darkTextSecondary),
-                ),
+                if (description != null)
+                  Text(
+                    description!,
+                    style: AppTypography.bodySmall(context)
+                        .copyWith(color: AppColors.darkTextSecondary),
+                  ),
               ],
             ),
           ),

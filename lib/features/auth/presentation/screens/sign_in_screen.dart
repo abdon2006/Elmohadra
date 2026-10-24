@@ -8,6 +8,8 @@ import 'package:elmohadra/core/theme/app_typography.dart';
 import 'package:elmohadra/core/widgets/app_text_field.dart';
 import 'package:elmohadra/core/widgets/app_toast.dart';
 import 'package:elmohadra/features/auth/domain/usecases/prams%20classes/signin_params.dart';
+import 'package:elmohadra/features/auth/presentation/blocs/Auth%20Bloc/bloc/auth_bloc.dart';
+import 'package:elmohadra/features/auth/presentation/blocs/Auth%20Bloc/events/auth_events.dart';
 import 'package:elmohadra/features/auth/presentation/blocs/SignIn%20Bloc/bloc/sign_in_bloc.dart';
 import 'package:elmohadra/features/auth/presentation/blocs/SignIn%20Bloc/events/sign_in_events.dart';
 import 'package:elmohadra/features/auth/presentation/blocs/SignIn%20Bloc/states/sign_in_states.dart';
@@ -152,7 +154,6 @@ class _SignInScreenState extends State<SignInScreen> {
                       AppToast.show(
                         context: context,
                         title: AppErrorMapper.toKey(state.failure).tr(),
-                        description: 'شسمنانمشسالنشالن',
                         type: AppToastType.error,
                       );
                     }
@@ -209,7 +210,9 @@ class _SignInScreenState extends State<SignInScreen> {
                 // ── University Account Secondary Button ───────────
                 AppButton(
                   title: 'sign_in_google'.tr(),
-                  onTap: () {},
+                  onTap: () => context.read<AuthBloc>().add(
+                    HandleSigningWithGoogleEvent(),
+                  ),
                   type: AppButtonType.secondary,
                   isLoading: false,
                 ),

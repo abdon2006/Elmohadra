@@ -8,7 +8,7 @@ import 'package:elmohadra/features/auth/presentation/blocs/Auth%20Bloc/states/au
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 
-@injectable
+@lazySingleton
 class AuthBloc extends Bloc<AuthEvents, AuthStates> {
   final GetCurrentUserUsecase getCurrentUserUsecase;
   final HandleSigningWithGoogleUsecase handleSigningWithGoogleUsecase;
