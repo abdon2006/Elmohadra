@@ -1,3 +1,4 @@
+import 'package:elmohadra/core/errors/failures.dart';
 import 'package:elmohadra/features/auth/domain/entities/user_entity.dart';
 import 'package:equatable/equatable.dart';
 
@@ -15,14 +16,19 @@ class SignUpLoading extends SignUpStates {
 
 class SignUpError extends SignUpStates {
   final String message;
-  SignUpError({required this.message});
+  final Failure failure;
+
+  SignUpError({required this.message, required this.failure});
+
   @override
-  List<Object?> get props => [message];
+  List<Object?> get props => [message, failure];
 }
 
 class SignUpSuccess extends SignUpStates {
   final UserEntity user;
+
   SignUpSuccess({required this.user});
+
   @override
   List<Object?> get props => [user];
 }

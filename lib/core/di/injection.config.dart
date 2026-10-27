@@ -39,6 +39,18 @@ import '../../features/auth/presentation/blocs/SignIn%20Bloc/bloc/sign_in_bloc.d
     as _i519;
 import '../../features/auth/presentation/blocs/SignUp%20Bloc/bloc/sign_up_bloc.dart'
     as _i128;
+import '../../features/characters/data/datasources/character_datasource.dart'
+    as _i736;
+import '../../features/characters/data/datasources/character_datasource_impl.dart'
+    as _i47;
+import '../../features/characters/data/repositories/character_repository_impl.dart'
+    as _i51;
+import '../../features/characters/domain/repositories/character_repository.dart'
+    as _i1057;
+import '../../features/characters/domain/usecases/get_characters_usecase.dart'
+    as _i951;
+import '../../features/characters/presentation/bloc/character_bloc.dart'
+    as _i204;
 import '../localization/locale_cubit.dart' as _i960;
 import '../theme/theme_cubit.dart' as _i611;
 import 'register_module.dart' as _i291;
@@ -56,6 +68,16 @@ extension GetItInjectableX on _i174.GetIt {
       preResolve: true,
     );
     gh.lazySingleton<_i454.SupabaseClient>(() => registerModule.supabaseClient);
+    gh.lazySingleton<_i736.CharacterDatasource>(
+      () => _i47.CharacterDatasourceImpl(
+        supabaseClient: gh<_i454.SupabaseClient>(),
+      ),
+    );
+    gh.lazySingleton<_i1057.CharacterRepository>(
+      () => _i51.CharacterRepositoryImpl(
+        characterDatasource: gh<_i736.CharacterDatasource>(),
+      ),
+    );
     gh.lazySingleton<_i107.AuthRemoteDataSource>(
       () => _i123.AuthRemoteDataSourceImpl(
         supabaseClient: gh<_i454.SupabaseClient>(),
@@ -66,6 +88,16 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.lazySingleton<_i611.ThemeCubit>(
       () => _i611.ThemeCubit(gh<_i460.SharedPreferences>()),
+    );
+    gh.factory<_i951.GetCharactersUsecase>(
+      () => _i951.GetCharactersUsecase(
+        characterRepository: gh<_i1057.CharacterRepository>(),
+      ),
+    );
+    gh.lazySingleton<_i204.CharacterBloc>(
+      () => _i204.CharacterBloc(
+        getCharactersUsecase: gh<_i951.GetCharactersUsecase>(),
+      ),
     );
     gh.lazySingleton<_i787.AuthRepository>(
       () => _i153.AuthRepositoryImpl(

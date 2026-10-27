@@ -1,4 +1,5 @@
 import 'package:elmohadra/core/theme/app_colors.dart';
+import 'package:elmohadra/core/theme/app_duration.dart';
 import 'package:elmohadra/core/theme/app_spacing.dart';
 import 'package:elmohadra/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
@@ -15,6 +16,7 @@ class AppButton extends StatefulWidget {
   final List<List<dynamic>>? icon;
   final double? width;
   final double? height;
+  final bool? isDisabled;
 
   const AppButton({
     super.key,
@@ -25,6 +27,7 @@ class AppButton extends StatefulWidget {
     this.icon,
     this.width,
     this.height,
+    this.isDisabled = false,
   });
 
   @override
@@ -34,13 +37,18 @@ class AppButton extends StatefulWidget {
 class _AppButtonState extends State<AppButton> {
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    bool Disabled = widget.isLoading || widget.isDisabled!;
     final bool isPrimary = widget.type == AppButtonType.primary;
     final bool isOutline = widget.type == AppButtonType.outline;
-    return SizedBox(
+    return AnimatedContainer(
+      duration: AppDuration.normal,
+      curve: Curves.easeInCubic,
       width: widget.width ?? double.infinity,
       height: widget.height ?? 50.h,
       child: ElevatedButton(
-        onPressed: widget.isLoading ? null : widget.onTap,
+        onPressed: Disabled ? null : widget.onTap,
+
         style: ElevatedButton.styleFrom(
           backgroundColor: isPrimary
               ? AppColors.accent
@@ -48,7 +56,7 @@ class _AppButtonState extends State<AppButton> {
           foregroundColor: isPrimary
               ? AppColors.onAccent
               : AppColors.darkTextPrimary,
-          disabledBackgroundColor: AppColors.accent.withValues(alpha: 0.5),
+          disabledBackgroundColor: AppColors.accent.withValues(alpha: 0.4),
           elevation: isPrimary ? 4 : 0,
           shadowColor: isPrimary
               ? AppColors.accent.withValues(alpha: 0.3)
@@ -74,14 +82,20 @@ class _AppButtonState extends State<AppButton> {
             : Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
-                    widget.title,
+                  AnimatedDefaultTextStyle(
+                    duration: AppDuration.normal,
+                    curve: Curves.easeInCubic,
                     style: AppTypography.cardTitle(context).copyWith(
                       color: isPrimary
-                          ? AppColors.onAccent
+                          ? Disabled
+                                ? isDark
+                                      ? AppColors.darkTextMuted
+                                      : AppColors.lightTextMuted
+                                : AppColors.onAccent
                           : AppColors.darkTextPrimary,
                       fontWeight: FontWeight.bold,
                     ),
+                    child: Text(widget.title),
                   ),
                   if (widget.icon != null) ...[
                     SizedBox(width: AppSpacing.xs.w),

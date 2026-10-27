@@ -16,7 +16,9 @@ abstract class AppTypography {
         )
       : GoogleFonts.russoOne(
           fontSize: 42.sp,
+          letterSpacing: -1.5,
           color: Theme.of(context).colorScheme.onSurface,
+          wordSpacing: -1,
         );
 
   static TextStyle sectionTitle(BuildContext context) => _isArabic(context)
@@ -25,6 +27,7 @@ abstract class AppTypography {
           color: Theme.of(context).colorScheme.onSurface,
         )
       : GoogleFonts.russoOne(
+          wordSpacing: -1,
           fontSize: 20.sp,
           color: Theme.of(context).colorScheme.onSurface,
         );
@@ -35,6 +38,8 @@ abstract class AppTypography {
           color: Theme.of(context).colorScheme.onSurface,
         )
       : GoogleFonts.russoOne(
+          wordSpacing: -1,
+
           fontSize: 16.sp,
           color: Theme.of(context).colorScheme.onSurface,
         );
@@ -47,7 +52,7 @@ abstract class AppTypography {
           height: 1.6,
           color: Theme.of(context).colorScheme.onSurface,
         )
-      : GoogleFonts.russoOne(
+      : GoogleFonts.exo2(
           fontSize: 14.sp,
           fontWeight: FontWeight.w400,
           height: 1.5,
@@ -61,7 +66,7 @@ abstract class AppTypography {
           height: 1.5,
           color: Theme.of(context).colorScheme.onSurface,
         )
-      : GoogleFonts.russoOne(
+      : GoogleFonts.exo2(
           fontSize: 12.sp,
           fontWeight: FontWeight.w400,
           color: Theme.of(context).colorScheme.onSurface,
@@ -73,7 +78,7 @@ abstract class AppTypography {
           fontWeight: FontWeight.w400,
           color: AppColors.darkTextMuted,
         )
-      : GoogleFonts.russoOne(
+      : GoogleFonts.exo2(
           fontSize: 12.sp,
           fontWeight: FontWeight.w400,
           color: AppColors.darkTextMuted,
@@ -86,7 +91,7 @@ abstract class AppTypography {
           height: 1.6,
           color: Theme.of(context).colorScheme.onSurface,
         )
-      : GoogleFonts.russoOne(
+      : GoogleFonts.exo2(
           fontSize: 18.sp,
           fontWeight: FontWeight.w600,
           height: 1.5,

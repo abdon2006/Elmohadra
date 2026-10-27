@@ -8,13 +8,12 @@ import 'package:injectable/injectable.dart';
 class SignUpBloc extends Bloc<SignUpBlocEvents, SignUpStates> {
   final SignupWithEmailUsecase signupWithEmailUsecase;
 
-  SignUpBloc({required this.signupWithEmailUsecase})
-    : super(SignUpInitial()) {
+  SignUpBloc({required this.signupWithEmailUsecase}) : super(SignUpInitial()) {
     on<SignUpEvent>((event, emit) async {
       emit(SignUpLoading());
       final res = await signupWithEmailUsecase(event.params);
       res.fold(
-        (l) => emit(SignUpError(message: l.message)),
+        (l) => emit(SignUpError(message: l.message, failure: l)),
         (r) => emit(SignUpSuccess(user: r)),
       );
     });

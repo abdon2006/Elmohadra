@@ -19,5 +19,54 @@
       "email_not_confirmed": "لم يتم تأكيد البريد الإلكتروني",
       "user_not_found": "الحساب غير موجود"
     }
+  },
+  "validation": {
+    "required": "هذا الحقل مطلوب",
+    "invalid_email": "البريد الإلكتروني غير صحيح",
+    "password_length": "كلمة المرور لا تقل عن 8 أحرف",
+    "password_format": "كلمة المرور تحتوي على حرف ورقم على الأقل",
+    "nickname_min": "اسم المستخدم لا يقل عن 3 أحرف",
+    "nickname_max": "اسم المستخدم لا يزيد عن 20 حرف",
+    "nickname_no_spaces": "اسم المستخدم لا يحتوي على مسافات",
+    "name_min": "الاسم لا يقل عن 3 أحرف",
+    "university_min": "اسم الكلية لا يقل عن 3 أحرف"
+  },
+  "signup": {
+    "step_indicator": "الخطوة {{current}} من {{total}}",
+    "next": "التالي",
+    "back": "رجوع",
+    "header_title": "انشئ حسابك",
+    "submit": "إنشاء الحساب",
+    "already_have_account": "عندك حساب ؟ ",
+    "sign_in": "سجل الدخول",
+    "step1": {
+      "title": "أمّن حسابك",
+      "subtitle": "عشان محدش ياخد بياناتك",
+      "email_label": "البريد الإلكتروني",
+      "email_hint": "ahmed@example.com",
+      "password_label": "كلمة المرور",
+      "password_hint": "٨ أحرف على الأقل"
+    },
+    "step2": {
+      "title": "جاهز لأول\nتحدي؟",
+      "subtitle": "عرفنا عنك",
+      "name_label": "الاسم الكامل",
+      "name_hint": "اسمك في البطاقة",
+      "nickname_label": "الاسم في اللعبة",
+      "nickname_hint": "الاسم اللي هيشوفك بيه الكل"
+    },
+    "step3": {
+      "title": "بتدرس\nفين؟",
+      "subtitle": "عشان نوصلك بزمايلك",
+      "university_label": "الكلية",
+      "university_hint": "حاسبات اسكندرية....",
+      "year_label": "في سنة كام يا عجوز"
+    },
+    "step4": {
+      "title": "اختار شخصيتك",
+      "subtitle": "تقدر تفتح أكتر بعدين",
+      "locked": "مقفول",
+      "coins_to_unlock": "{{coins}} كوين"
+    }
   }
 }

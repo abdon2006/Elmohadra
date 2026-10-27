@@ -19,5 +19,54 @@
       "email_not_confirmed": "Please confirm your email address",
       "user_not_found": "Account not found"
     }
+  },
+  "validation": {
+    "required": "This field is required",
+    "invalid_email": "Invalid email address",
+    "password_length": "Password must be at least 8 characters",
+    "password_format": "Password must contain at least one letter and one number",
+    "nickname_min": "Nickname must be at least 3 characters",
+    "nickname_max": "Nickname must not exceed 20 characters",
+    "nickname_no_spaces": "Nickname cannot contain spaces",
+    "name_min": "Name must be at least 3 characters",
+    "university_min": "University must be at least 3 characters"
+  },
+  "signup": {
+    "step_indicator": "Step {{current}} of {{total}}",
+    "next": "Next",
+    "back": "Back",
+    "header_title": "Create Account",
+    "submit": "Create Account",
+    "already_have_account": "Already have an account?",
+    "sign_in": "Sign In",
+    "step1": {
+      "title": "Secure\nyour account",
+      "subtitle": "You'll use this to log in",
+      "email_label": "Email",
+      "email_hint": "ahmed@example.com",
+      "password_label": "Password",
+      "password_hint": "Min 8 characters"
+    },
+    "step2": {
+      "title": "Ready for your first challenge?",
+      "subtitle": "Tell us who you are",
+      "name_label": "Full Name",
+      "name_hint": "Your Full Name",
+      "nickname_label": "Nickname",
+      "nickname_hint": "Your name in the game"
+    },
+    "step3": {
+      "title": "Where do\nyou study?",
+      "subtitle": "We'll match you with your peers",
+      "university_label": "College",
+      "university_hint": "Write your College",
+      "year_label": "Select Your Level"
+    },
+    "step4": {
+      "title": "Choose\nyour fighter",
+      "subtitle": "You can unlock more later",
+      "locked": "Locked",
+      "coins_to_unlock": "{{coins}} coins"
+    }
   }
 }

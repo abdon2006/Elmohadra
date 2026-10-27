@@ -12,6 +12,7 @@ import 'package:elmohadra/core/theme/app_theme.dart';
 import 'package:elmohadra/core/theme/theme_cubit.dart';
 import 'package:elmohadra/features/auth/presentation/blocs/Auth%20Bloc/bloc/auth_bloc.dart';
 import 'package:elmohadra/features/auth/presentation/blocs/Auth%20Bloc/events/auth_events.dart';
+import 'package:elmohadra/features/characters/presentation/bloc/character_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -40,6 +41,7 @@ void main() async {
           BlocProvider(create: (context) => getIt<LocaleCubit>()),
           BlocProvider(create: (context) => getIt<ThemeCubit>()),
           BlocProvider(create: (context) => getIt<AuthBloc>()),
+          BlocProvider(create: (context) => getIt<CharacterBloc>()),
         ],
         child: ElmohadraApp(),
       ),

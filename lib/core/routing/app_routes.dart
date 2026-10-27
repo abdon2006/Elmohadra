@@ -7,5 +7,4 @@ class AppRoutes {
   static const String vault = '/vault';
   static const String signin = '/signin';
   static const String signup = '/signup';
-  static const String complete = '/complete';
 }

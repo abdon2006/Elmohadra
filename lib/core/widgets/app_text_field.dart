@@ -1,5 +1,7 @@
 import 'package:elmohadra/core/theme/app_colors.dart';
+import 'package:elmohadra/core/theme/app_curves.dart';
 import 'package:elmohadra/core/theme/app_duration.dart';
+import 'package:elmohadra/core/theme/app_spacing.dart';
 import 'package:elmohadra/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -12,6 +14,7 @@ class AppTextField extends StatefulWidget {
   final IconData? prefixIcon;
   final TextInputType? keyboardType;
   final String? Function(String?)? validator;
+  final String? errorText;
 
   const AppTextField({
     super.key,
@@ -22,6 +25,7 @@ class AppTextField extends StatefulWidget {
     this.prefixIcon,
     this.keyboardType,
     this.validator,
+    this.errorText,
   });
 
   @override
@@ -62,14 +66,16 @@ class _AppTextFieldState extends State<AppTextField> {
       children: [
         AnimatedDefaultTextStyle(
           duration: AppDuration.normal,
-          style: AppTypography.bodySmall(context),
+          style: AppTypography.bodyMedium(context),
           child: Text(widget.label),
         ),
         SizedBox(height: 6.h),
         AnimatedContainer(
           duration: const Duration(milliseconds: 300),
           decoration: BoxDecoration(
-            color: _isFocused ? theme.surface.withOpacity(0.8) : theme.surface,
+            color: _isFocused
+                ? theme.surface.withValues(alpha: 0.8)
+                : theme.surface,
             borderRadius: BorderRadius.circular(16.r),
             border: Border.all(
               color: _isFocused ? AppColors.accent : Colors.transparent,
@@ -78,7 +84,7 @@ class _AppTextFieldState extends State<AppTextField> {
             boxShadow: _isFocused
                 ? [
                     BoxShadow(
-                      color: AppColors.accent.withOpacity(0.15),
+                      color: AppColors.accent.withValues(alpha: 0.15),
                       blurRadius: 8,
                       spreadRadius: 1,
                     ),
@@ -118,6 +124,15 @@ class _AppTextFieldState extends State<AppTextField> {
             ),
           ),
         ),
+        SizedBox(height: AppSpacing.xs.h),
+        if (widget.errorText != null)
+          AnimatedDefaultTextStyle(
+            style: AppTypography.bodySmall(context)
+                .copyWith(color: AppColors.error),
+            duration: AppDuration.normal,
+            curve: AppCurves.standard,
+            child: Text(widget.errorText!),
+          ),
       ],
     );
   }
