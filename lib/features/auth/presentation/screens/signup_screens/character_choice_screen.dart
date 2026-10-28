@@ -83,12 +83,12 @@ class CharacterChoiceScreenState extends State<CharacterChoiceScreen> {
               ),
 
               SizedBox(height: AppSpacing.md.h),
-              buildSelectedCharacterImage(
+              _buildSelectedCharacterImage(
                 selectedCharacter: selectedCharacter,
                 characters: characters,
               ),
               SizedBox(height: AppSpacing.sm.h),
-              buildSelectedCharacterInfo(
+              _buildSelectedCharacterInfo(
                 characters: characters,
                 context: context,
                 selectedCharacter: selectedCharacter,
@@ -107,18 +107,20 @@ class CharacterChoiceScreenState extends State<CharacterChoiceScreen> {
                     bool isSelected = selectedCharacter == i;
                     bool isLocked = characters[i].isLocked;
                     return buildCharacterShip(
-                      onTap: () => setState(() {
-                        selectedCharacter = i;
-                        if (charactersCopy.isNotEmpty &&
-                            i < charactersCopy.length) {
-                          characterKey =
-                              charactersCopy[selectedCharacter].characterKey;
-                          print(characterKey);
-                        }
-                        validateInputs();
+                      onTap: () =>
+                          setState(() {
+                            selectedCharacter = i;
+                            if (charactersCopy.isNotEmpty &&
+                                i < charactersCopy.length) {
+                              characterKey =
+                                  charactersCopy[selectedCharacter]
+                                      .characterKey;
+                              print(characterKey);
+                            }
+                            validateInputs();
 
-                        widget.onChanged();
-                      }),
+                            widget.onChanged();
+                          }),
                       isSelected: isSelected,
                       characters: characters,
                       isLocked: isLocked,
@@ -178,12 +180,12 @@ Widget buildCharacterShip({
                 : Colors.transparent,
             boxShadow: isSelected && !isLocked
                 ? [
-                    BoxShadow(
-                      color: AppColors.accent.withValues(alpha: 0.25),
-                      blurRadius: 7,
-                      spreadRadius: 2,
-                    ),
-                  ]
+              BoxShadow(
+                color: AppColors.accent.withValues(alpha: 0.25),
+                blurRadius: 7,
+                spreadRadius: 2,
+              ),
+            ]
                 : [],
             border: isSelected && !isLocked
                 ? Border.all(color: AppColors.accent, width: 1.5)
@@ -219,12 +221,15 @@ Widget buildCharacterShip({
   );
 }
 
-Widget buildSelectedCharacterInfo({
+Widget _buildSelectedCharacterInfo({
   required int selectedCharacter,
   required List<CharacterEntity> characters,
   required BuildContext context,
 }) {
-  bool isArabic = context.read<LocaleCubit>().state.isArabic;
+  bool isArabic = context
+      .read<LocaleCubit>()
+      .state
+      .isArabic;
   return AppAnimatedEntry(
     delay: const Duration(milliseconds: 500),
     child: AnimatedSwitcher(
@@ -274,7 +279,7 @@ Widget buildSelectedCharacterInfo({
   );
 }
 
-Widget buildSelectedCharacterImage({
+Widget _buildSelectedCharacterImage({
   required int selectedCharacter,
   required List<CharacterEntity> characters,
 }) {

@@ -39,6 +39,8 @@ import '../../features/auth/presentation/blocs/SignIn%20Bloc/bloc/sign_in_bloc.d
     as _i519;
 import '../../features/auth/presentation/blocs/SignUp%20Bloc/bloc/sign_up_bloc.dart'
     as _i128;
+import '../../features/auth/presentation/blocs/signup_cubit/signup_cubit.dart'
+    as _i578;
 import '../../features/characters/data/datasources/character_datasource.dart'
     as _i736;
 import '../../features/characters/data/datasources/character_datasource_impl.dart'
@@ -67,6 +69,7 @@ extension GetItInjectableX on _i174.GetIt {
       () => registerModule.sharedPreferences,
       preResolve: true,
     );
+    gh.factory<_i578.SignupCubit>(() => _i578.SignupCubit());
     gh.lazySingleton<_i454.SupabaseClient>(() => registerModule.supabaseClient);
     gh.lazySingleton<_i736.CharacterDatasource>(
       () => _i47.CharacterDatasourceImpl(

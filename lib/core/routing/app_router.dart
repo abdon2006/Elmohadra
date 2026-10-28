@@ -5,6 +5,8 @@ import 'package:elmohadra/core/routing/main_shell.dart';
 import 'package:elmohadra/features/auth/domain/usecases/signin_with_email_usecase.dart';
 import 'package:elmohadra/features/auth/presentation/blocs/Auth%20Bloc/states/auth_states.dart';
 import 'package:elmohadra/features/auth/presentation/blocs/SignIn%20Bloc/bloc/sign_in_bloc.dart';
+import 'package:elmohadra/features/auth/presentation/blocs/SignUp%20Bloc/bloc/sign_up_bloc.dart';
+import 'package:elmohadra/features/auth/presentation/blocs/signup_cubit/signup_cubit.dart';
 import 'package:elmohadra/features/auth/presentation/screens/sign_in_screen.dart';
 import 'package:elmohadra/features/auth/presentation/screens/signup_screens/sign_up_screen.dart';
 import 'package:flutter/material.dart';
@@ -63,7 +65,14 @@ GoRouter appRouter(AuthNotifier authNotifier) {
       GoRoute(
         path: AppRoutes.signup,
         name: AppRoutes.signup,
-        builder: (context, state) => SignUpScreen(),
+
+        builder: (context, state) => MultiBlocProvider(
+          providers: [
+            BlocProvider(create: (_) => getIt<SignupCubit>()),
+            BlocProvider(create: (_) => getIt<SignUpBloc>()),
+          ],
+          child: SignUpScreen(),
+        ),
       ),
     ],
 
@@ -71,7 +80,13 @@ GoRouter appRouter(AuthNotifier authNotifier) {
       final authState = authNotifier.authBloc.state;
       return switch (authState) {
         AuthAuthenticated() => AppRoutes.home,
-        AuthNewUser() => AppRoutes.signup,
+        AuthNewUser(user: var authresult) => Uri(
+          path: AppRoutes.signup,
+          queryParameters: {
+            'email': authresult.newUseremail ?? '',
+            'id': authresult.newUserId ?? '',
+          },
+        ).toString(),
         AuthUnAuthenticated() => AppRoutes.signin,
         AuthError() => AppRoutes.signin,
         _ => null,

@@ -1,4 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:elmohadra/core/di/injection.dart';
 import 'package:elmohadra/core/localization/locale_cubit.dart';
 import 'package:elmohadra/core/routing/app_routes.dart';
 import 'package:elmohadra/core/theme/app_colors.dart';
@@ -7,8 +8,12 @@ import 'package:elmohadra/core/theme/app_duration.dart';
 import 'package:elmohadra/core/theme/app_radius.dart';
 import 'package:elmohadra/core/theme/app_spacing.dart';
 import 'package:elmohadra/core/theme/app_typography.dart';
-import 'package:elmohadra/core/widgets/app_button.dart';
 import 'package:elmohadra/core/widgets/divider_with_icon.dart';
+import 'package:elmohadra/features/auth/domain/usecases/prams%20classes/signup_params.dart';
+import 'package:elmohadra/features/auth/presentation/blocs/SignUp%20Bloc/bloc/sign_up_bloc.dart';
+import 'package:elmohadra/features/auth/presentation/blocs/SignUp%20Bloc/events/sing_up_bloc_events.dart';
+import 'package:elmohadra/features/auth/presentation/blocs/SignUp%20Bloc/states/sign_up_bloc_states.dart';
+import 'package:elmohadra/features/auth/presentation/blocs/signup_cubit/signup_cubit.dart';
 import 'package:elmohadra/features/auth/presentation/screens/signup_screens/character_choice_screen.dart';
 import 'package:elmohadra/features/auth/presentation/screens/signup_screens/credential_screen.dart';
 import 'package:elmohadra/features/auth/presentation/screens/signup_screens/name_screen.dart';
@@ -19,6 +24,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hugeicons/hugeicons.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+import '../../../../../core/widgets/app_button.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -33,64 +41,189 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final universityFormKey = GlobalKey<UniInfoScreenState>();
   final characterFormKey = GlobalKey<CharacterChoiceScreenState>();
   bool isFromGoogle = false;
+  int currentScreen = 0;
+  late List<Widget> screens = [];
 
   @override
-  void initState() {
-    super.initState();
-    // isFromGoogle = context.read<AuthBloc>().state == Auth
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (screens.isEmpty) {
+      final uri = GoRouterState.of(context).uri;
+      final email = uri.queryParameters['email'];
+      final id = uri.queryParameters['id'];
+
+      bool isGoogle = email != null || id != null;
+      if (isGoogle) {
+        context.read<SignupCubit>().initGoogleDate(email: email!);
+        screens = [
+          NameScreen(key: nameFormKey, onChanged: () => setState(() {})),
+          UniInfoScreen(
+            key: universityFormKey,
+            onChanged: () => setState(() {}),
+          ),
+          CharacterChoiceScreen(
+            key: characterFormKey,
+            onChanged: () => setState(() {}),
+          ),
+          SummaryScreen(),
+        ];
+      } else {
+        screens = [
+          CredentialScreen(
+            key: credentialFormKey,
+            onChanged: () => setState(() {}),
+          ),
+          NameScreen(key: nameFormKey, onChanged: () => setState(() {})),
+          UniInfoScreen(
+            key: universityFormKey,
+            onChanged: () => setState(() {}),
+          ),
+          CharacterChoiceScreen(
+            key: characterFormKey,
+            onChanged: () => setState(() {}),
+          ),
+          SummaryScreen(),
+        ];
+      }
+    }
   }
 
-  bool get isValidated => switch (currentScreen) {
-    0 => credentialFormKey.currentState?.validateInputs() ?? false,
-    1 => nameFormKey.currentState?.validateInputs() ?? false,
-    2 => universityFormKey.currentState?.validateInputs() ?? false,
-    3 => characterFormKey.currentState?.validateInputs() ?? false,
-    _ => false,
-  };
+  bool get isValidated {
+    final currentWidget = screens[currentScreen];
 
-  bool get isDisabled => switch (currentScreen) {
-    0 => credentialFormKey.currentState?.isDisabled() ?? true,
-    1 => nameFormKey.currentState?.isDisabled() ?? true,
-    2 => universityFormKey.currentState?.isDisabled() ?? true,
-    3 => characterFormKey.currentState?.isDisabled() ?? true,
-    _ => false,
-    //
-  };
+    if (currentWidget is CredentialScreen) {
+      return credentialFormKey.currentState?.validateInputs() ?? false;
+    } else if (currentWidget is NameScreen) {
+      return nameFormKey.currentState?.validateInputs() ?? false;
+    } else if (currentWidget is UniInfoScreen) {
+      return universityFormKey.currentState?.validateInputs() ?? false;
+    } else if (currentWidget is CharacterChoiceScreen) {
+      return characterFormKey.currentState?.validateInputs() ?? false;
+    }
+    return true;
+  }
 
-  Widget _buildHeader() => Row(
-    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-    children: [
-      Text(
-        "signup.header_title".tr(),
-        style: AppTypography.screenTitle(context),
-      ),
-      Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: () => context.read<LocaleCubit>().toggle(context),
-          splashColor: AppColors.accent.withValues(alpha: 0.08),
+  void handleEventsPerTap({required BuildContext context}) async {
+    if (isValidated) {
+      final cubit = context.read<SignupCubit>();
+      final currentWidget = screens[currentScreen];
 
-          customBorder: CircleBorder(),
-          child: Ink(
-            padding: EdgeInsets.all(AppSpacing.sm),
-            decoration: BoxDecoration(shape: BoxShape.circle),
-            child: Center(
-              child: HugeIcon(icon: HugeIcons.strokeRoundedTranslation),
+      // سحب الداتا من الشاشة الحالية وتخزينها في الـ Cubit
+      if (currentWidget is CredentialScreen) {
+        final state = credentialFormKey.currentState;
+        if (state != null) {
+          cubit.updateCredentialData(
+            email: state.emailController.text.trim(),
+            password: state.passController.text,
+          );
+          await getIt<SupabaseClient>().auth.signOut();
+        }
+      } else if (currentWidget is NameScreen) {
+        final state = nameFormKey.currentState;
+        if (state != null) {
+          cubit.updateNameData(
+            name: state.nameController.text.trim(),
+            nickName: state.nicknameController.text.trim(),
+          );
+        }
+      } else if (currentWidget is UniInfoScreen) {
+        final state = universityFormKey.currentState;
+        if (state != null) {
+          cubit.updateUniversityInfo(
+            universityName: state.universityController.text.trim(),
+            academicYear: state.selectedAcademicYear ?? 1,
+          );
+        }
+      } else if (currentWidget is CharacterChoiceScreen) {
+        final state = characterFormKey.currentState;
+        if (state != null) {
+          cubit.updateAvatarKey(avatarKey: state.characterKey);
+        }
+      }
+
+      if (currentScreen < screens.length - 1) {
+        setState(() => currentScreen++);
+      } else {
+        print('Final Signup Data Payload: ${cubit.state}');
+        final state = cubit.state;
+        context.read<SignUpBloc>().add(
+          SignUpEvent(
+            params: SignupParams(
+              name: state.name,
+              nickName: state.nickName,
+              password: state.password,
+              email: state.email,
+              university: state.universityName,
+              academicYear: state.academicYear,
+              avatarKey: state.avatarKey,
             ),
           ),
-        ),
-      ),
-    ],
+        );
+      }
+    }
+  }
+
+  bool get isDisabled {
+    final currentWidget = screens[currentScreen];
+
+    if (currentWidget is CredentialScreen) {
+      return credentialFormKey.currentState?.isDisabled() ?? true;
+    } else if (currentWidget is NameScreen) {
+      return nameFormKey.currentState?.isDisabled() ?? true;
+    } else if (currentWidget is UniInfoScreen) {
+      return universityFormKey.currentState?.isDisabled() ?? true;
+    } else if (currentWidget is CharacterChoiceScreen) {
+      return characterFormKey.currentState?.isDisabled() ?? true;
+    }
+    return false;
+  }
+
+  Widget _buildHeader() => AnimatedSwitcher(
+    duration: AppDuration.normal,
+    switchInCurve: AppCurves.standard,
+    switchOutCurve: Curves.easeIn,
+    child: currentScreen == screens.length - 1
+        ? Text(
+            key: ValueKey('final_step'),
+            'signup.final_title'.tr(),
+            style: AppTypography.screenTitle(context),
+          )
+        : Row(
+            key: ValueKey('step'),
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                "signup.header_title".tr(),
+                style: AppTypography.screenTitle(context),
+              ),
+              Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: () => context.read<LocaleCubit>().toggle(context),
+                  splashColor: AppColors.accent.withValues(alpha: 0.08),
+
+                  customBorder: CircleBorder(),
+                  child: Ink(
+                    padding: EdgeInsets.all(AppSpacing.sm),
+                    decoration: BoxDecoration(shape: BoxShape.circle),
+                    child: Center(
+                      child: HugeIcon(icon: HugeIcons.strokeRoundedTranslation),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
   );
 
-  Widget _buildProgressBar() => Row(
-    children: List.generate(screens.length, (i) {
-      bool isDone = currentScreen >= i;
-      return Expanded(
-        child: AnimatedOpacity(
-          opacity: currentScreen == screens.length - 1 ? 0 : 1,
-          duration: AppDuration.slow,
-          curve: AppCurves.standard,
+  Widget _buildProgressBar() => AnimatedOpacity(
+    opacity: currentScreen == screens.length - 1 ? 0 : 1,
+    duration: AppDuration.normal,
+    curve: AppCurves.standard,
+    child: Row(
+      children: List.generate(screens.length, (i) {
+        bool isDone = currentScreen >= i;
+        return Expanded(
           child: AnimatedContainer(
             duration: AppDuration.slow,
             curve: AppCurves.standard,
@@ -106,22 +239,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
               borderRadius: BorderRadius.circular(AppRadius.md),
             ),
           ),
-        ),
-      );
-    }),
-  );
-
-  late final List<Widget> screens = [
-    CredentialScreen(key: credentialFormKey, onChanged: () => setState(() {})),
-    NameScreen(key: nameFormKey, onChanged: () => setState(() {})),
-    UniInfoScreen(key: universityFormKey, onChanged: () => setState(() {})),
-    CharacterChoiceScreen(
-      key: characterFormKey,
-      onChanged: () => setState(() {}),
+        );
+      }),
     ),
-    SummaryScreen(),
-  ];
-  int currentScreen = 0;
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -148,19 +269,18 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     ),
                   ),
                 ),
-                AppButton(
-                  title: currentScreen == screens.length - 1
-                      ? "signup.submit".tr()
-                      : "signup.next".tr(),
-                  onTap: () {
-                    if (isValidated) {
-                      setState(() => currentScreen++);
-                    }
+                BlocBuilder<SignUpBloc, SignUpStates>(
+                  builder: (context, state) {
+                    return AppButton(
+                      title: currentScreen == screens.length - 1
+                          ? "signup.submit".tr()
+                          : "signup.next".tr(),
+                      onTap: () => handleEventsPerTap(context: context),
+                      type: AppButtonType.primary,
+                      isLoading: state is SignUpLoading,
+                      isDisabled: isDisabled,
+                    );
                   },
-                  type: AppButtonType.primary,
-                  isLoading: false,
-                  // TODO handle loading state using Bloc
-                  isDisabled: isDisabled,
                 ),
                 Padding(
                   padding: EdgeInsets.symmetric(vertical: AppSpacing.md.h),

@@ -41,11 +41,17 @@ class AuthRemoteDataSourceImpl extends AuthRemoteDataSource {
   @override
   Future<UserModel> signUpWithEmail(SignupParams params) async {
     try {
-      final res = await supabaseClient.auth.signUp(
-        password: params.password,
-        email: params.email,
-      );
-      final userId = res.user?.id;
+      final String userId;
+      if (params.password != null) {
+        final res = await supabaseClient.auth.signUp(
+          password: params.password!,
+          email: params.email,
+        );
+        userId = res.user!.id;
+      } else {
+        userId = supabaseClient.auth.currentUser!.id;
+      }
+
       final res2 = await supabaseClient.from('users').insert({
         'id': userId,
         'name': params.name,
@@ -61,9 +67,10 @@ class AuthRemoteDataSourceImpl extends AuthRemoteDataSource {
         'draw_battles': 0,
         'coins': 0,
         'avatar_key': params.avatarKey,
-        'created_at': DateTime.now(),
+        'created_at': DateTime.now().toIso8601String(),
         'status': UserStatus.active.name,
       }).select();
+
       return UserModel.fromJson(res2[0]);
     } catch (e) {
       rethrow;
