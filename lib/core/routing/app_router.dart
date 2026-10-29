@@ -9,6 +9,7 @@ import 'package:elmohadra/features/auth/presentation/blocs/SignUp%20Bloc/bloc/si
 import 'package:elmohadra/features/auth/presentation/blocs/signup_cubit/signup_cubit.dart';
 import 'package:elmohadra/features/auth/presentation/screens/sign_in_screen.dart';
 import 'package:elmohadra/features/auth/presentation/screens/signup_screens/sign_up_screen.dart';
+import 'package:elmohadra/features/user/presentation/screens/profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -45,8 +46,7 @@ GoRouter appRouter(AuthNotifier authNotifier) {
           GoRoute(
             path: AppRoutes.profile,
             name: AppRoutes.profile,
-            builder: (context, state) =>
-                Scaffold(body: Center(child: Text('profile'))),
+            builder: (context, state) => ProfileScreen(),
           ),
         ],
       ),
@@ -78,16 +78,27 @@ GoRouter appRouter(AuthNotifier authNotifier) {
 
     redirect: (context, state) {
       final authState = authNotifier.authBloc.state;
+      final goingTo = state.matchedLocation;
+      final allowedWhenUnauth = [AppRoutes.signin, AppRoutes.signup];
+
       return switch (authState) {
-        AuthAuthenticated() => AppRoutes.home,
-        AuthNewUser(user: var authresult) => Uri(
-          path: AppRoutes.signup,
-          queryParameters: {
-            'email': authresult.newUseremail ?? '',
-            'id': authresult.newUserId ?? '',
-          },
-        ).toString(),
-        AuthUnAuthenticated() => AppRoutes.signin,
+        AuthAuthenticated() =>
+          allowedWhenUnauth.contains(goingTo) ? AppRoutes.home : null,
+        AuthNewUser(user: var authresult) =>
+          allowedWhenUnauth.contains(goingTo)
+              ? null
+              : Uri(
+                  path: AppRoutes.signup,
+                  queryParameters: {
+                    if (authresult.newUseremail != null)
+                      'email': authresult.newUseremail!,
+                    if (authresult.newUserId != null)
+                      'id': authresult.newUserId!,
+                  },
+                ).toString(),
+
+        AuthUnAuthenticated() =>
+          allowedWhenUnauth.contains(goingTo) ? null : AppRoutes.signin,
         AuthError() => AppRoutes.signin,
         _ => null,
       };

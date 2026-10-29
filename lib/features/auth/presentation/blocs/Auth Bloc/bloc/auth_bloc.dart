@@ -1,3 +1,4 @@
+import 'package:elmohadra/core/di/injection.dart';
 import 'package:elmohadra/core/usecase/base_usecase.dart';
 import 'package:elmohadra/features/auth/domain/entities/auth_user_result.dart';
 import 'package:elmohadra/features/auth/domain/usecases/get_current_user_usecase.dart';
@@ -7,6 +8,7 @@ import 'package:elmohadra/features/auth/presentation/blocs/Auth%20Bloc/events/au
 import 'package:elmohadra/features/auth/presentation/blocs/Auth%20Bloc/states/auth_states.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 @lazySingleton
 class AuthBloc extends Bloc<AuthEvents, AuthStates> {
@@ -36,7 +38,9 @@ class AuthBloc extends Bloc<AuthEvents, AuthStates> {
 
     on<DeepLinkReceivedEvent>((event, emit) async {
       emit(AuthLoading());
-
+      await getIt<SupabaseClient>().auth.onAuthStateChange
+          .where((e) => e.event == AuthChangeEvent.signedIn)
+          .first;
       final res = await getCurrentUserUsecase(NoParams());
       res.fold((failure) => emit(AuthUnAuthenticated()), (success) {
         if (success.existingUser != null) {

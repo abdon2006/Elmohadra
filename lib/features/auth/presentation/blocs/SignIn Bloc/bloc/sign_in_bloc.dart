@@ -1,4 +1,7 @@
+import 'package:elmohadra/core/di/injection.dart';
 import 'package:elmohadra/features/auth/domain/usecases/signin_with_email_usecase.dart';
+import 'package:elmohadra/features/auth/presentation/blocs/Auth%20Bloc/bloc/auth_bloc.dart';
+import 'package:elmohadra/features/auth/presentation/blocs/Auth%20Bloc/events/auth_events.dart';
 import 'package:elmohadra/features/auth/presentation/blocs/SignIn%20Bloc/events/sign_in_events.dart';
 import 'package:elmohadra/features/auth/presentation/blocs/SignIn%20Bloc/states/sign_in_states.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -13,10 +16,12 @@ class SignInBloc extends Bloc<SignInBlocEvents, SignInBlocStates> {
     on<SignInEvent>((event, emit) async {
       emit(SigninBlocLoading());
       final res = await signinWithEmailUsecase(event.params);
-      res.fold(
-        (l) => emit(SigninBlocError(message: l.message, failure: l)),
-        (r) => emit(SigninBlocSuccess(user: r)),
-      );
+      res.fold((l) => emit(SigninBlocError(message: l.message, failure: l)), (
+        r,
+      ) {
+        emit(SigninBlocSuccess(user: r));
+        getIt<AuthBloc>().add(CheckAuthStatusEvent());
+      });
     });
   }
 }

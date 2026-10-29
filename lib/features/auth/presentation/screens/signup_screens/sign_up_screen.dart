@@ -1,5 +1,4 @@
 import 'package:easy_localization/easy_localization.dart';
-import 'package:elmohadra/core/di/injection.dart';
 import 'package:elmohadra/core/localization/locale_cubit.dart';
 import 'package:elmohadra/core/routing/app_routes.dart';
 import 'package:elmohadra/core/theme/app_colors.dart';
@@ -24,7 +23,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hugeicons/hugeicons.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../../../core/widgets/app_button.dart';
 
@@ -52,7 +50,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
       final email = uri.queryParameters['email'];
       final id = uri.queryParameters['id'];
 
-      bool isGoogle = email != null || id != null;
+      bool isGoogle =
+          (email != null && email.isNotEmpty) || (id != null && id.isNotEmpty);
       if (isGoogle) {
         context.read<SignupCubit>().initGoogleDate(email: email!);
         screens = [
@@ -108,7 +107,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
       final cubit = context.read<SignupCubit>();
       final currentWidget = screens[currentScreen];
 
-      // سحب الداتا من الشاشة الحالية وتخزينها في الـ Cubit
       if (currentWidget is CredentialScreen) {
         final state = credentialFormKey.currentState;
         if (state != null) {
@@ -116,7 +114,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
             email: state.emailController.text.trim(),
             password: state.passController.text,
           );
-          await getIt<SupabaseClient>().auth.signOut();
         }
       } else if (currentWidget is NameScreen) {
         final state = nameFormKey.currentState;
