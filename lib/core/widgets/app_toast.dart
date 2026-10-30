@@ -34,7 +34,7 @@ class AppToast {
       context: context,
       autoCloseDuration: const Duration(seconds: 3),
       alignment: Alignment.topCenter,
-      animationDuration: const Duration(milliseconds: 300),
+      animationDuration: const Duration(milliseconds: 400),
 
       builder: (context, holder) => _AppToastWidget(
         title: title,

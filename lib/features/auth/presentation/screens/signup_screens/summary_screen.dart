@@ -1,8 +1,10 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:elmohadra/core/localization/locale_cubit.dart';
 import 'package:elmohadra/core/theme/app_colors.dart';
 import 'package:elmohadra/core/theme/app_curves.dart';
 import 'package:elmohadra/core/theme/app_duration.dart';
 import 'package:elmohadra/core/theme/app_radius.dart';
+import 'package:elmohadra/core/theme/app_shadows.dart';
 import 'package:elmohadra/core/theme/app_spacing.dart';
 import 'package:elmohadra/core/theme/app_typography.dart';
 import 'package:elmohadra/core/widgets/app_animated_entry.dart';
@@ -186,6 +188,7 @@ Widget buildInfoPreview({
     padding: EdgeInsets.all(AppSpacing.lg.w),
     decoration: BoxDecoration(
       color: theme.surface,
+      boxShadow: AppShadows.card,
       borderRadius: BorderRadius.circular(AppRadius.md),
     ),
     child: Column(
@@ -199,7 +202,10 @@ Widget buildInfoPreview({
               children: [
                 AppAnimatedEntry(
                   delay: Duration(milliseconds: 2000),
-                  child: Text("الاسم", style: AppTypography.muted(context)),
+                  child: Text(
+                    "signup.summary.name".tr(),
+                    style: AppTypography.muted(context),
+                  ),
                 ),
                 AppAnimatedEntry(
                   delay: Duration(milliseconds: 2300),
@@ -213,7 +219,7 @@ Widget buildInfoPreview({
                 AppAnimatedEntry(
                   delay: Duration(milliseconds: 2600),
                   child: Text(
-                    "اسم الشهرة",
+                    "signup.summary.nickname".tr(),
                     style: AppTypography.muted(context),
                   ),
                 ),
@@ -233,7 +239,7 @@ Widget buildInfoPreview({
                 AppAnimatedEntry(
                   delay: Duration(milliseconds: 3400),
                   child: Text(
-                    "السنة الدراسية",
+                    "signup.summary.academic_year".tr(),
                     style: AppTypography.muted(context),
                   ),
                 ),
@@ -248,7 +254,10 @@ Widget buildInfoPreview({
                 SizedBox(height: AppSpacing.md.h),
                 AppAnimatedEntry(
                   delay: Duration(milliseconds: 4000),
-                  child: Text("الجامعة", style: AppTypography.muted(context)),
+                  child: Text(
+                    "signup.summary.university".tr(),
+                    style: AppTypography.muted(context),
+                  ),
                 ),
                 AppAnimatedEntry(
                   delay: Duration(milliseconds: 4200),
@@ -269,53 +278,50 @@ Widget buildInfoPreview({
             color: AppColors.lightTextMuted.withValues(alpha: 0.3),
           ),
         ),
-        Directionality(
-          textDirection: TextDirection.ltr,
-          child: AppAnimatedEntry(
-            delay: Duration(milliseconds: 4500),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
+        AppAnimatedEntry(
+          delay: Duration(milliseconds: 4500),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: AppSpacing.sm.w,
+                  vertical: 3.h,
+                ),
+                decoration: BoxDecoration(
+                  color: AppColors.accent.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(AppRadius.full),
+                ),
+                child: Center(
+                  child: Text(
+                    state.email,
+                    style: GoogleFonts.exo2(
+                      fontSize: 13.sp,
+                      color: AppColors.accent,
+                    ),
+                  ),
+                ),
+              ),
+              if (isGoogle) ...[
                 Container(
                   padding: EdgeInsets.symmetric(
                     horizontal: AppSpacing.sm.w,
                     vertical: 3.h,
                   ),
                   decoration: BoxDecoration(
-                    color: AppColors.accent.withValues(alpha: 0.15),
+                    color: Color(0xFF4285F4).withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(AppRadius.full),
                   ),
                   child: Center(
                     child: Text(
-                      state.email,
-                      style: GoogleFonts.exo2(
-                        fontSize: 13.sp,
-                        color: AppColors.accent,
-                      ),
+                      "Google",
+                      style: AppTypography.bodySmall(context)
+                          .copyWith(color: Color(0xFF4285F4)),
                     ),
                   ),
                 ),
-                if (isGoogle) ...[
-                  Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: AppSpacing.sm.w,
-                      vertical: 3.h,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Color(0xFF4285F4).withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(AppRadius.full),
-                    ),
-                    child: Center(
-                      child: Text(
-                        "Google",
-                        style: AppTypography.bodySmall(context)
-                            .copyWith(color: Color(0xFF4285F4)),
-                      ),
-                    ),
-                  ),
-                ],
               ],
-            ),
+            ],
           ),
         ),
       ],

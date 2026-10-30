@@ -2,6 +2,8 @@ import 'package:elmohadra/core/di/injection.dart';
 import 'package:elmohadra/core/routing/app_routes.dart';
 import 'package:elmohadra/core/routing/auth_notifier.dart';
 import 'package:elmohadra/core/routing/main_shell.dart';
+import 'package:elmohadra/core/widgets/app_button.dart';
+import 'package:elmohadra/core/widgets/app_transition.dart';
 import 'package:elmohadra/features/auth/domain/usecases/signin_with_email_usecase.dart';
 import 'package:elmohadra/features/auth/presentation/blocs/Auth%20Bloc/states/auth_states.dart';
 import 'package:elmohadra/features/auth/presentation/blocs/SignIn%20Bloc/bloc/sign_in_bloc.dart';
@@ -28,25 +30,54 @@ GoRouter appRouter(AuthNotifier authNotifier) {
           GoRoute(
             path: AppRoutes.home,
             name: AppRoutes.home,
-            builder: (context, state) =>
-                Scaffold(body: Center(child: Text('home'))),
+            pageBuilder: (context, state) => buildPageTransition(
+              context: context,
+              state: state,
+              child: Scaffold(body: Center(child: Text('home'))),
+            ),
           ),
           GoRoute(
             path: AppRoutes.subjects,
             name: AppRoutes.subjects,
-            builder: (context, state) =>
-                Scaffold(body: Center(child: Text('subjects'))),
+            pageBuilder: (context, state) => buildPageTransition(
+              context: context,
+              state: state,
+              child: Scaffold(
+                body: Center(
+                  child: AppButton(
+                    title: 'as;fjas;fl',
+                    onTap: () {},
+                    type: AppButtonType.primary,
+                    isLoading: false,
+                  ),
+                ),
+              ),
+            ),
           ),
           GoRoute(
             path: AppRoutes.vault,
             name: AppRoutes.vault,
-            builder: (context, state) =>
-                Scaffold(body: Center(child: Text('vault'))),
+            pageBuilder: (context, state) => buildPageTransition(
+              context: context,
+              state: state,
+              child: Scaffold(
+                body: AppButton(
+                  title: 'as;fjas;fl',
+                  onTap: () {},
+                  type: AppButtonType.primary,
+                  isLoading: false,
+                ),
+              ),
+            ),
           ),
           GoRoute(
             path: AppRoutes.profile,
             name: AppRoutes.profile,
-            builder: (context, state) => ProfileScreen(),
+            pageBuilder: (context, state) => buildPageTransition(
+              context: context,
+              state: state,
+              child: ProfileScreen(),
+            ),
           ),
         ],
       ),
@@ -54,11 +85,15 @@ GoRouter appRouter(AuthNotifier authNotifier) {
       GoRoute(
         path: AppRoutes.signin,
         name: AppRoutes.signin,
-        builder: (context, state) => BlocProvider(
-          create: (context) => SignInBloc(
-            signinWithEmailUsecase: getIt<SigninWithEmailUsecase>(),
+        pageBuilder: (context, state) => buildPageTransition(
+          context: context,
+          state: state,
+          child: BlocProvider(
+            create: (context) => SignInBloc(
+              signinWithEmailUsecase: getIt<SigninWithEmailUsecase>(),
+            ),
+            child: SignInScreen(),
           ),
-          child: SignInScreen(),
         ),
       ),
 
@@ -66,12 +101,16 @@ GoRouter appRouter(AuthNotifier authNotifier) {
         path: AppRoutes.signup,
         name: AppRoutes.signup,
 
-        builder: (context, state) => MultiBlocProvider(
-          providers: [
-            BlocProvider(create: (_) => getIt<SignupCubit>()),
-            BlocProvider(create: (_) => getIt<SignUpBloc>()),
-          ],
-          child: SignUpScreen(),
+        pageBuilder: (context, state) => buildPageTransition(
+          context: context,
+          state: state,
+          child: MultiBlocProvider(
+            providers: [
+              BlocProvider(create: (_) => getIt<SignupCubit>()),
+              BlocProvider(create: (_) => getIt<SignUpBloc>()),
+            ],
+            child: SignUpScreen(),
+          ),
         ),
       ),
     ],

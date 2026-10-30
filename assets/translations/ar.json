@@ -1,24 +1,78 @@
 {
   "sign_in": "تسجيل الدخول",
-  "battle_continues": "المعركة لسه مكملة!",
-  "battle_subtitle": "ارجع لتحدياتك، وكمل طريقك للقمة.",
-  "email_label": "البريد الالكتروني",
-  "email_hint": "ادخل البريد الالكتروني",
-  "password_label": "كلمة المرور",
-  "password_hint": "••••••••",
+  "battle_continues": "المعركة مستمرة",
+  "battle_subtitle": "سجّل دخولك وكمّل من حيث وقفت",
+  "email_hint": "دخل ايميلك",
+  "email_label": "الايميل",
+  "password_hint": "دخل الباسوورد اللي سجلت بيه",
+  "password_label": "الباسوورد",
   "forgot_password": "نسيت كلمة المرور؟",
-  "enter_now": "دخول الساحة",
-  "sign_in_google": "تسجيل بجوجل ",
-  "dont_have_account": "لسه جديد؟ ",
+  "enter_now": "ادخل دلوقتي",
+  "sign_in_google": "الدخول عن طريق Google",
+  "dont_have_account": "معندكش حساب؟ ",
   "create_one": "انشئ حساب",
+  "signup": {
+    "header_title": "انشئ حسابك",
+    "final_title": "جاهز تبدأ؟",
+    "next": "التالي",
+    "submit": "ابدأ المعركة",
+    "already_have_account": "عندك حساب؟ ",
+    "signin": "سجل بيه",
+    "step1": {
+      "title": "يلا نبدأ المحاضرة",
+      "subtitle": "كارنيهك يا بشمهندس",
+      "email_hint": "دخل ايميلك",
+      "email_label": "الايميل",
+      "password_hint": "اعمل باسوورد ومتقوليش عليه",
+      "password_label": "الباسوورد"
+    },
+    "step2": {
+      "title": "نقولك يا بشمهندس ايه ؟ ...",
+      "subtitle": "اختار اسم ليك الناس تشوفك بيه",
+      "name_hint": "اسمك الكامل",
+      "name_label": "الاسم",
+      "nickname_hint": "صحابك بينادولك اي",
+      "nickname_label": "اسم الشهرة"
+    },
+    "step3": {
+      "title": "كليتك إيه؟",
+      "subtitle": "هنوصلك بطلاب من نفس كليتك",
+      "university_hint": "اسم الكلية",
+      "university_label": "الجامعة / الكلية",
+      "year_label": "في سة كام ؟"
+    },
+    "step4": {
+      "title": "اختار شخصيتك",
+      "subtitle": "هي اللي هتمثلك في المعارك"
+    },
+    "summary": {
+      "name": "الاسم",
+      "nickname": "اسم الشهرة",
+      "academic_year": "السنة الدراسية",
+      "university": "الجامعة"
+    }
+  },
   "errors": {
     "network": "تحقق من اتصالك بالإنترنت",
     "unknown": "حدث خطأ، حاول مرة أخرى",
     "auth": {
-      "invalid_credentials": "البريد الإلكتروني أو كلمة المرور غلط",
+      "invalid_credentials": "الايميل أو الباسورد غلط",
+      "invalid_credentials_sub": "تأكد وحاول تاني",
       "email_not_confirmed": "لم يتم تأكيد البريد الإلكتروني",
-      "user_not_found": "الحساب غير موجود"
+      "user_not_found": "الحساب غير موجود",
+      "email_already_exists": "الايميل ده متسجل قبل كده",
+      "email_already_exists_sub": "جرب ايميل تاني"
     }
+  },
+  "toast": {
+    "signin_success": "أهلاً بيك، يلا نبدأ! 🔥",
+    "signin_success_sub": "وحشتنا يا بطل",
+    "signup_success": "تم إنشاء حسابك بنجاح ⚡",
+    "signup_success_sub": "الساحة اتفتحت عليك",
+    "google_success": "تم الدخول عن طريق Google ✓",
+    "google_success_sub": "جاهز تبدأ معركتك؟",
+    "signout_success": "اتسجلت برا، إلى اللقاء 👋",
+    "signout_success_sub": "هترجع قريب عارف 😏"
   },
   "validation": {
     "required": "هذا الحقل مطلوب",
@@ -30,48 +84,5 @@
     "nickname_no_spaces": "اسم المستخدم لا يحتوي على مسافات",
     "name_min": "الاسم لا يقل عن 3 أحرف",
     "university_min": "اسم الكلية لا يقل عن 3 أحرف"
-  },
-  "signup": {
-    "final_title": "جاهز للمعركة",
-    "step_indicator": "الخطوة {{current}} من {{total}}",
-    "next": "التالي",
-    "back": "رجوع",
-    "header_title": "انشئ حسابك",
-    "submit": "إنشاء الحساب",
-    "already_have_account": "عندك حساب ؟ ",
-    "sign_in": "سجل الدخول",
-    "step1": {
-      "title": "أمّن حسابك",
-      "subtitle": "عشان محدش ياخد بياناتك",
-      "email_label": "البريد الإلكتروني",
-      "email_hint": "ahmed@example.com",
-      "password_label": "كلمة المرور",
-      "password_hint": "٨ أحرف على الأقل"
-    },
-    "step2": {
-      "title": "جاهز لأول\nتحدي؟",
-      "subtitle": "عرفنا عنك",
-      "name_label": "الاسم الكامل",
-      "name_hint": "اسمك في البطاقة",
-      "nickname_label": "الاسم في اللعبة",
-      "nickname_hint": "الاسم اللي هيشوفك بيه الكل"
-    },
-    "step3": {
-      "title": "بتدرس\nفين؟",
-      "subtitle": "عشان نوصلك بزمايلك",
-      "university_label": "الكلية",
-      "university_hint": "حاسبات اسكندرية....",
-      "year_label": "في سنة كام يا عجوز"
-    },
-    "step4": {
-      "title": "اختار شخصيتك",
-      "subtitle": "تقدر تفتح أكتر بعدين",
-      "locked": "مقفول",
-      "coins_to_unlock": "{{coins}} كوين"
-    },
-    "step5": {
-      "title": "تأكيد بياناتك",
-      "subtitle": "راجع بياناتك قبل إنشاء الحساب"
-    }
   }
 }

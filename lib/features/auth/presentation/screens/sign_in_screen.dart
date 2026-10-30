@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:elmohadra/core/constants/app_assets.dart';
 import 'package:elmohadra/core/constants/app_vaildators.dart';
+import 'package:elmohadra/core/di/injection.dart';
 import 'package:elmohadra/core/errors/app_error_mapper.dart';
 import 'package:elmohadra/core/localization/locale_cubit.dart';
 import 'package:elmohadra/core/routing/app_routes.dart';
@@ -51,6 +52,17 @@ class _SignInScreenState extends State<SignInScreen> {
     _emailController.dispose();
     _passController.dispose();
     super.dispose();
+  }
+
+  void showToastAndDispatch() async {
+    AppToast.show(
+      context: context,
+      title: 'toast.signin_success'.tr(),
+      description: 'toast.signin_success_sub'.tr(),
+      type: AppToastType.success,
+    );
+    await Future.delayed((Duration(seconds: 1)));
+    getIt<AuthBloc>().add(CheckAuthStatusEvent());
   }
 
   @override
@@ -123,7 +135,6 @@ class _SignInScreenState extends State<SignInScreen> {
                   ),
                   SizedBox(height: AppSpacing.lg.h),
 
-                  // ── Text Fields ───────────────────────────────────
                   AppTextField(
                     hint: "email_hint".tr(),
                     label: "email_label".tr(),
@@ -166,9 +177,14 @@ class _SignInScreenState extends State<SignInScreen> {
                       if (state is SigninBlocError) {
                         AppToast.show(
                           context: context,
-                          title: AppErrorMapper.toKey(state.failure).tr(),
+                          title: AppErrorTitleMapper.toKey(state.failure).tr(),
+                          description: AppErrorDescMapper.toKey(state.failure)
+                              ?.tr(),
                           type: AppToastType.error,
                         );
+                      }
+                      if (state is SigninBlocSuccess) {
+                        showToastAndDispatch();
                       }
                     },
                     builder: (context, state) {
@@ -225,7 +241,7 @@ class _SignInScreenState extends State<SignInScreen> {
                         style: AppTypography.muted(context),
                       ),
                       GestureDetector(
-                        onTap: () => context.go(AppRoutes.signup),
+                        onTap: () => context.pushReplacement(AppRoutes.signup),
                         child: Text(
                           "create_one".tr(),
                           style: AppTypography.bodySmall(context).copyWith(

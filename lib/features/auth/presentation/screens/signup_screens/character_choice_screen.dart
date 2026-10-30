@@ -107,20 +107,18 @@ class CharacterChoiceScreenState extends State<CharacterChoiceScreen> {
                     bool isSelected = selectedCharacter == i;
                     bool isLocked = characters[i].isLocked;
                     return buildCharacterShip(
-                      onTap: () =>
-                          setState(() {
-                            selectedCharacter = i;
-                            if (charactersCopy.isNotEmpty &&
-                                i < charactersCopy.length) {
-                              characterKey =
-                                  charactersCopy[selectedCharacter]
-                                      .characterKey;
-                              print(characterKey);
-                            }
-                            validateInputs();
+                      onTap: () => setState(() {
+                        selectedCharacter = i;
+                        if (charactersCopy.isNotEmpty &&
+                            i < charactersCopy.length) {
+                          characterKey =
+                              charactersCopy[selectedCharacter].characterKey;
+                          print(characterKey);
+                        }
+                        validateInputs();
 
-                            widget.onChanged();
-                          }),
+                        widget.onChanged();
+                      }),
                       isSelected: isSelected,
                       characters: characters,
                       isLocked: isLocked,
@@ -180,19 +178,18 @@ Widget buildCharacterShip({
                 : Colors.transparent,
             boxShadow: isSelected && !isLocked
                 ? [
-              BoxShadow(
-                color: AppColors.accent.withValues(alpha: 0.25),
-                blurRadius: 7,
-                spreadRadius: 2,
-              ),
-            ]
+                    BoxShadow(
+                      color: AppColors.accent.withValues(alpha: 0.25),
+                      blurRadius: 7,
+                      spreadRadius: 2,
+                    ),
+                  ]
                 : [],
             border: isSelected && !isLocked
                 ? Border.all(color: AppColors.accent, width: 1.5)
                 : null,
             borderRadius: borderRadius,
           ),
-          // استخدام ClipRRect بـ structural alignment مع الـ borderRadius للخارج
           child: ClipRRect(
             borderRadius: borderRadius,
             child: Stack(
@@ -226,10 +223,7 @@ Widget _buildSelectedCharacterInfo({
   required List<CharacterEntity> characters,
   required BuildContext context,
 }) {
-  bool isArabic = context
-      .read<LocaleCubit>()
-      .state
-      .isArabic;
+  bool isArabic = context.read<LocaleCubit>().state.isArabic;
   return AppAnimatedEntry(
     delay: const Duration(milliseconds: 500),
     child: AnimatedSwitcher(
@@ -305,7 +299,7 @@ Widget _buildSelectedCharacterImage({
         ),
         child: ClipOval(
           child: Padding(
-            padding: EdgeInsets.all(3.w), // مسافة أمان صغيرة جوة البوردر
+            padding: EdgeInsets.all(3.w),
             child: ClipOval(
               child: Image.network(
                 characters[selectedCharacter].imageUrl,

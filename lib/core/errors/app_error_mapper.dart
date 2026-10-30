@@ -1,6 +1,6 @@
 import 'package:elmohadra/core/errors/failures.dart';
 
-class AppErrorMapper {
+class AppErrorTitleMapper {
   static String toKey(Failure failure) {
     return switch (failure) {
       NetworkFailure() => 'errors.network',
@@ -13,6 +13,19 @@ class AppErrorMapper {
         _ => 'errors.unknown',
       },
       _ => 'errors.unknown',
+    };
+  }
+}
+
+class AppErrorDescMapper {
+  static String? toKey(Failure failure) {
+    return switch (failure) {
+      AuthFailure(:final code) => switch (code) {
+        _ when code.contains('invalid_credentials') =>
+          'errors.auth.invalid_credentials_sub',
+        _ => null,
+      },
+      _ => null,
     };
   }
 }

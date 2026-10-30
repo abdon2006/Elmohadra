@@ -148,8 +148,9 @@ class UniInfoScreenState extends State<UniInfoScreen> {
                         onSelected: (bool selected) {
                           setState(() {
                             selectedAcademicYear = selected ? year : null;
-                            if (_academicYearError != null)
+                            if (_academicYearError != null) {
                               _academicYearError = null;
+                            }
                           });
                           widget.onChanged?.call();
                         },
@@ -158,7 +159,6 @@ class UniInfoScreenState extends State<UniInfoScreen> {
                   }).toList(),
                 ),
 
-                // 4. عرض الخطأ الخاص بالسنة الدراسية لو مكنتش متحددة وداس "التالي"
                 if (_academicYearError != null) ...[
                   SizedBox(height: AppSpacing.xs.h),
                   Text(

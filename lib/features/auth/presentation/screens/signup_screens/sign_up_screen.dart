@@ -259,8 +259,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
           if (state.isExist) {
             AppToast.show(
               context: context,
-              title: "الايميل اللي سجلت بيه متسجل قبل كده",
-              description: "جرب ايميل تاني",
+              title: "errors.auth.email_already_exists".tr(),
+              description: "errors.auth.email_already_exists_sub".tr(),
               type: AppToastType.error,
             );
           } else {
@@ -319,9 +319,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           style: AppTypography.muted(context),
                         ),
                         GestureDetector(
-                          onTap: () => context.go(AppRoutes.signin),
+                          onTap: () =>
+                              context.pushReplacement(AppRoutes.signin),
                           child: Text(
-                            "create_one".tr(),
+                            "signup.signin".tr(),
                             style: AppTypography.bodySmall(context).copyWith(
                               color: AppColors.accent,
                               fontWeight: FontWeight.bold,
