@@ -39,6 +39,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final nameFormKey = GlobalKey<NameScreenState>();
   final universityFormKey = GlobalKey<UniInfoScreenState>();
   final characterFormKey = GlobalKey<CharacterChoiceScreenState>();
+  final summaryFormKey = GlobalKey<SummaryScreenState>();
   bool isFromGoogle = false;
   int currentScreen = 0;
   late List<Widget> screens = [];
@@ -65,7 +66,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
             key: characterFormKey,
             onChanged: () => setState(() {}),
           ),
-          SummaryScreen(),
+          SummaryScreen(key: summaryFormKey, onReady: () => setState(() {})),
         ];
       } else {
         screens = [
@@ -82,7 +83,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
             key: characterFormKey,
             onChanged: () => setState(() {}),
           ),
-          SummaryScreen(),
+          SummaryScreen(key: summaryFormKey, onReady: () => setState(() {})),
         ];
       }
     }
@@ -176,6 +177,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
       return universityFormKey.currentState?.isDisabled() ?? true;
     } else if (currentWidget is CharacterChoiceScreen) {
       return characterFormKey.currentState?.isDisabled() ?? true;
+    } else if (currentWidget is SummaryScreen) {
+      return !(summaryFormKey.currentState?.isReady ?? true);
     }
     return false;
   }

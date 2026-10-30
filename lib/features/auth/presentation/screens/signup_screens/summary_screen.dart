@@ -16,8 +16,28 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class SummaryScreen extends StatelessWidget {
-  const SummaryScreen({super.key});
+class SummaryScreen extends StatefulWidget {
+  final VoidCallback onReady;
+
+  const SummaryScreen({super.key, required this.onReady});
+
+  @override
+  State<SummaryScreen> createState() => SummaryScreenState();
+}
+
+class SummaryScreenState extends State<SummaryScreen> {
+  bool isReady = false;
+
+  @override
+  void initState() {
+    super.initState();
+    if (mounted) {
+      Future.delayed(Duration(seconds: 5), () {
+        widget.onReady.call();
+        setState(() => isReady = true);
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
