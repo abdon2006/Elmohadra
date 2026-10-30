@@ -32,6 +32,7 @@
     "university_min": "University must be at least 3 characters"
   },
   "signup": {
+    "final_title": "Ready For The Battle",
     "step_indicator": "Step {{current}} of {{total}}",
     "next": "Next",
     "back": "Back",
@@ -67,6 +68,10 @@
       "subtitle": "You can unlock more later",
       "locked": "Locked",
       "coins_to_unlock": "{{coins}} coins"
+    },
+    "step5": {
+      "title": "Confirm your info",
+      "subtitle": "Review your details before creating your account"
     }
   }
 }

@@ -22,6 +22,8 @@ import '../../features/auth/data/datasources/auth_remote_data_source_impl.dart'
 import '../../features/auth/data/repositories/auth_repository_impl.dart'
     as _i153;
 import '../../features/auth/domain/repositories/auth_repository.dart' as _i787;
+import '../../features/auth/domain/usecases/check_email_is_exist_usecase.dart'
+    as _i216;
 import '../../features/auth/domain/usecases/get_current_user_usecase.dart'
     as _i17;
 import '../../features/auth/domain/usecases/get_user_by_id_usecase.dart'
@@ -107,6 +109,11 @@ extension GetItInjectableX on _i174.GetIt {
         authRemoteDataSource: gh<_i107.AuthRemoteDataSource>(),
       ),
     );
+    gh.factory<_i216.CheckEmailIsExistUsecase>(
+      () => _i216.CheckEmailIsExistUsecase(
+        authRepository: gh<_i787.AuthRepository>(),
+      ),
+    );
     gh.factory<_i17.GetCurrentUserUsecase>(
       () => _i17.GetCurrentUserUsecase(
         authRepository: gh<_i787.AuthRepository>(),
@@ -149,6 +156,7 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i128.SignUpBloc>(
       () => _i128.SignUpBloc(
         signupWithEmailUsecase: gh<_i397.SignupWithEmailUsecase>(),
+        checkEmailIsExistUsecase: gh<_i216.CheckEmailIsExistUsecase>(),
       ),
     );
     return this;

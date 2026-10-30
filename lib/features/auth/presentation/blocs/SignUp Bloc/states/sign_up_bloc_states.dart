@@ -32,3 +32,12 @@ class SignUpSuccess extends SignUpStates {
   @override
   List<Object?> get props => [user];
 }
+
+class EmailIsExist extends SignUpStates {
+  final bool isExist;
+
+  EmailIsExist({required this.isExist});
+
+  @override
+  List<Object?> get props => [isExist];
+}

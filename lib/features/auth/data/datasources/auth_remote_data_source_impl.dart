@@ -130,4 +130,15 @@ class AuthRemoteDataSourceImpl extends AuthRemoteDataSource {
       return AuthUserResult();
     }
   }
+
+  @override
+  Future<bool> checkEmailIsExist(String email) async {
+    final res = await supabaseClient.from('users').select().eq('email', email);
+    print('check email res: $res');
+    if (res.isEmpty) {
+      return false;
+    } else {
+      return true;
+    }
+  }
 }

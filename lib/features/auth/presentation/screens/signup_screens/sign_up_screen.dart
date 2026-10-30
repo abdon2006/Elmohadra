@@ -7,6 +7,7 @@ import 'package:elmohadra/core/theme/app_duration.dart';
 import 'package:elmohadra/core/theme/app_radius.dart';
 import 'package:elmohadra/core/theme/app_spacing.dart';
 import 'package:elmohadra/core/theme/app_typography.dart';
+import 'package:elmohadra/core/widgets/app_toast.dart';
 import 'package:elmohadra/core/widgets/divider_with_icon.dart';
 import 'package:elmohadra/features/auth/domain/usecases/prams%20classes/signup_params.dart';
 import 'package:elmohadra/features/auth/presentation/blocs/SignUp%20Bloc/bloc/sign_up_bloc.dart';
@@ -114,6 +115,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
             email: state.emailController.text.trim(),
             password: state.passController.text,
           );
+          context.read<SignUpBloc>().add(
+            CheckEmailIsExist(email: state.emailController.text.trim()),
+          );
+          return;
         }
       } else if (currentWidget is NameScreen) {
         final state = nameFormKey.currentState;
@@ -245,63 +250,86 @@ class _SignUpScreenState extends State<SignUpScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context).colorScheme;
     final isDark = theme.brightness == Brightness.dark;
-    return GestureDetector(
-      onTap: () => FocusScope.of(context).unfocus(),
-      child: Scaffold(
-        body: SafeArea(
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: AppSpacing.sm.w),
-            child: Column(
-              children: [
-                _buildHeader(),
-                appDivider(isDark: isDark),
-                _buildProgressBar(),
-                SizedBox(height: AppSpacing.md.h),
-                Expanded(
-                  child: Align(
-                    alignment: Alignment.topCenter,
-                    child: AnimatedSwitcher(
-                      duration: AppDuration.normal,
-                      child: screens[currentScreen],
+    return BlocListener<SignUpBloc, SignUpStates>(
+      listener: (_, state) {
+        if (state is EmailIsExist) {
+          if (state.isExist) {
+            AppToast.show(
+              context: context,
+              title: "الايميل اللي سجلت بيه متسجل قبل كده",
+              description: "جرب ايميل تاني",
+              type: AppToastType.error,
+            );
+          } else {
+            setState(() => currentScreen++);
+          }
+        }
+        if (state is SignUpError) {
+          AppToast.show(
+            context: context,
+            title: state.message,
+            type: AppToastType.error,
+          );
+        }
+      },
+      child: GestureDetector(
+        onTap: () => FocusScope.of(context).unfocus(),
+        child: Scaffold(
+          body: SafeArea(
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: AppSpacing.sm.w),
+              child: Column(
+                children: [
+                  _buildHeader(),
+                  appDivider(isDark: isDark),
+                  _buildProgressBar(),
+                  SizedBox(height: AppSpacing.md.h),
+                  Expanded(
+                    child: Align(
+                      alignment: Alignment.topCenter,
+                      child: AnimatedSwitcher(
+                        duration: AppDuration.normal,
+                        child: screens[currentScreen],
+                      ),
                     ),
                   ),
-                ),
-                BlocBuilder<SignUpBloc, SignUpStates>(
-                  builder: (context, state) {
-                    return AppButton(
-                      title: currentScreen == screens.length - 1
-                          ? "signup.submit".tr()
-                          : "signup.next".tr(),
-                      onTap: () => handleEventsPerTap(context: context),
-                      type: AppButtonType.primary,
-                      isLoading: state is SignUpLoading,
-                      isDisabled: isDisabled,
-                    );
-                  },
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric(vertical: AppSpacing.md.h),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        "signup.already_have_account".tr(),
-                        style: AppTypography.muted(context),
-                      ),
-                      GestureDetector(
-                        onTap: () => context.go(AppRoutes.signin),
-                        child: Text(
-                          "create_one".tr(),
-                          style: AppTypography.bodySmall(context).copyWith(
-                            color: AppColors.accent,
-                            fontWeight: FontWeight.bold,
+                  BlocBuilder<SignUpBloc, SignUpStates>(
+                    builder: (context, state) {
+                      return AppButton(
+                        title: currentScreen == screens.length - 1
+                            ? "signup.submit".tr()
+                            : "signup.next".tr(),
+                        onTap: () => handleEventsPerTap(context: context),
+                        type: AppButtonType.primary,
+                        isLoading: state is SignUpLoading,
+                        isDisabled: isDisabled,
+                      );
+                    },
+                  ),
+                  Padding(
+                    padding: EdgeInsets.symmetric(vertical: AppSpacing.md.h),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          "signup.already_have_account".tr(),
+                          style: AppTypography.muted(context),
+                        ),
+                        GestureDetector(
+                          onTap: () => context.go(AppRoutes.signin),
+                          child: Text(
+                            "create_one".tr(),
+                            style: AppTypography.bodySmall(context).copyWith(
+                              color: AppColors.accent,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

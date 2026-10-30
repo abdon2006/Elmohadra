@@ -125,4 +125,21 @@ class AuthRepositoryImpl extends AuthRepository {
       };
     }
   }
+
+  @override
+  Future<Either<Failure, bool>> checkEmailIsExist(String email) async {
+    try {
+      final res = await authRemoteDataSource.checkEmailIsExist(email);
+      return Right(res);
+    } catch (e) {
+      return switch (e) {
+        AuthException() => Left(
+          AuthFailure(message: e.toString(), code: e.code ?? "Unknown"),
+        ),
+        PostgrestException() => Left(ServerFailure(message: e.toString())),
+        SocketException() => Left(NetworkFailure(message: e.toString())),
+        _ => Left(ServerFailure(message: e.toString())),
+      };
+    }
+  }
 }

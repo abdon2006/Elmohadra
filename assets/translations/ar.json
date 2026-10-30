@@ -32,6 +32,7 @@
     "university_min": "اسم الكلية لا يقل عن 3 أحرف"
   },
   "signup": {
+    "final_title": "جاهز للمعركة",
     "step_indicator": "الخطوة {{current}} من {{total}}",
     "next": "التالي",
     "back": "رجوع",
@@ -67,6 +68,10 @@
       "subtitle": "تقدر تفتح أكتر بعدين",
       "locked": "مقفول",
       "coins_to_unlock": "{{coins}} كوين"
+    },
+    "step5": {
+      "title": "تأكيد بياناتك",
+      "subtitle": "راجع بياناتك قبل إنشاء الحساب"
     }
   }
 }

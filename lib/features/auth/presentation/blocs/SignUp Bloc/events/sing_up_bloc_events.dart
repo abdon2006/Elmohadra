@@ -6,7 +6,18 @@ abstract class SignUpBlocEvents extends Equatable {}
 
 class SignUpEvent extends SignUpBlocEvents {
   final SignupParams params;
+
   SignUpEvent({required this.params});
+
   @override
   List<Object?> get props => [params];
+}
+
+class CheckEmailIsExist extends SignUpBlocEvents {
+  final String email;
+
+  CheckEmailIsExist({required this.email});
+
+  @override
+  List<Object?> get props => [email];
 }

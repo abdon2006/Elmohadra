@@ -1,4 +1,5 @@
 import 'package:elmohadra/core/di/injection.dart';
+import 'package:elmohadra/features/auth/domain/usecases/check_email_is_exist_usecase.dart';
 import 'package:elmohadra/features/auth/domain/usecases/signup_with_email_usecase.dart';
 import 'package:elmohadra/features/auth/presentation/blocs/Auth%20Bloc/bloc/auth_bloc.dart';
 import 'package:elmohadra/features/auth/presentation/blocs/Auth%20Bloc/events/auth_events.dart';
@@ -10,8 +11,12 @@ import 'package:injectable/injectable.dart';
 @injectable
 class SignUpBloc extends Bloc<SignUpBlocEvents, SignUpStates> {
   final SignupWithEmailUsecase signupWithEmailUsecase;
+  final CheckEmailIsExistUsecase checkEmailIsExistUsecase;
 
-  SignUpBloc({required this.signupWithEmailUsecase}) : super(SignUpInitial()) {
+  SignUpBloc({
+    required this.signupWithEmailUsecase,
+    required this.checkEmailIsExistUsecase,
+  }) : super(SignUpInitial()) {
     on<SignUpEvent>((event, emit) async {
       emit(SignUpLoading());
       final res = await signupWithEmailUsecase(event.params);
@@ -19,6 +24,14 @@ class SignUpBloc extends Bloc<SignUpBlocEvents, SignUpStates> {
         emit(SignUpSuccess(user: r));
         getIt<AuthBloc>().add(CheckAuthStatusEvent());
       });
+    });
+    on<CheckEmailIsExist>((event, emit) async {
+      emit(SignUpLoading());
+      final res = await checkEmailIsExistUsecase(event.email);
+      res.fold(
+        (l) => emit(SignUpError(message: l.message, failure: l)),
+        (r) => emit(EmailIsExist(isExist: r)),
+      );
     });
   }
 }
