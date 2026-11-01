@@ -1,4 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:elmohadra/core/di/injection.dart';
 import 'package:elmohadra/core/localization/locale_cubit.dart';
 import 'package:elmohadra/core/routing/app_routes.dart';
 import 'package:elmohadra/core/theme/app_colors.dart';
@@ -10,6 +11,8 @@ import 'package:elmohadra/core/theme/app_typography.dart';
 import 'package:elmohadra/core/widgets/app_toast.dart';
 import 'package:elmohadra/core/widgets/divider_with_icon.dart';
 import 'package:elmohadra/features/auth/domain/usecases/prams%20classes/signup_params.dart';
+import 'package:elmohadra/features/auth/presentation/blocs/Auth%20Bloc/bloc/auth_bloc.dart';
+import 'package:elmohadra/features/auth/presentation/blocs/Auth%20Bloc/events/auth_events.dart';
 import 'package:elmohadra/features/auth/presentation/blocs/SignUp%20Bloc/bloc/sign_up_bloc.dart';
 import 'package:elmohadra/features/auth/presentation/blocs/SignUp%20Bloc/events/sing_up_bloc_events.dart';
 import 'package:elmohadra/features/auth/presentation/blocs/SignUp%20Bloc/states/sign_up_bloc_states.dart';
@@ -249,6 +252,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
     ),
   );
 
+  void showSignupToastAndDispatch() async {
+    AppToast.show(
+      context: context,
+      title: 'اهلا بيك يا بطل نورت المحاضرة',
+      type: AppToastType.success,
+      description: "استكشف المواد وابدا رحلتك",
+    );
+    await Future.delayed(Duration(seconds: 1));
+    getIt<AuthBloc>().add(CheckAuthStatusEvent());
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context).colorScheme;
@@ -274,6 +288,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
             type: AppToastType.error,
           );
         }
+        if (state is SignUpSuccess) {}
       },
       child: GestureDetector(
         onTap: () => FocusScope.of(context).unfocus(),

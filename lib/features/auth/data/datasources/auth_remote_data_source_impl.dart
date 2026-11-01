@@ -133,18 +133,10 @@ class AuthRemoteDataSourceImpl extends AuthRemoteDataSource {
 
   @override
   Future<bool> checkEmailIsExist(String email) async {
-    try {
-      final res = await supabaseClient.auth.signInWithPassword(
-        password: 'fake_password',
-        email: email,
-      );
-      return true;
-    } on AuthApiException catch (e) {
-      if (e.code == 'invalid_credentials') {
-        // يعني الايميل موجود بس الباس غلط فبرضو مينفعش يسجل بيه
-        return true;
-      }
-      return false;
-    }
+    final res = await supabaseClient.functions.invoke(
+      'check-email-exists',
+      body: {'email': email},
+    );
+    return res.data['exists'] as bool;
   }
 }
