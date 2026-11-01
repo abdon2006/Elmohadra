@@ -9,6 +9,7 @@ import 'package:elmohadra/features/auth/presentation/blocs/Auth%20Bloc/states/au
 import 'package:elmohadra/features/auth/presentation/blocs/SignIn%20Bloc/bloc/sign_in_bloc.dart';
 import 'package:elmohadra/features/auth/presentation/blocs/SignUp%20Bloc/bloc/sign_up_bloc.dart';
 import 'package:elmohadra/features/auth/presentation/blocs/signup_cubit/signup_cubit.dart';
+import 'package:elmohadra/features/auth/presentation/screens/home_screen.dart';
 import 'package:elmohadra/features/auth/presentation/screens/sign_in_screen.dart';
 import 'package:elmohadra/features/auth/presentation/screens/signup_screens/sign_up_screen.dart';
 import 'package:elmohadra/features/user/presentation/screens/profile_screen.dart';
@@ -33,7 +34,7 @@ GoRouter appRouter(AuthNotifier authNotifier) {
             pageBuilder: (context, state) => buildPageTransition(
               context: context,
               state: state,
-              child: Scaffold(body: Center(child: Text('home'))),
+              child: HomeScreen(),
             ),
           ),
           GoRoute(

@@ -13,6 +13,7 @@ import 'package:elmohadra/core/widgets/divider_with_icon.dart';
 import 'package:elmohadra/features/auth/domain/usecases/prams%20classes/signup_params.dart';
 import 'package:elmohadra/features/auth/presentation/blocs/Auth%20Bloc/bloc/auth_bloc.dart';
 import 'package:elmohadra/features/auth/presentation/blocs/Auth%20Bloc/events/auth_events.dart';
+import 'package:elmohadra/features/auth/presentation/blocs/Auth%20Bloc/states/auth_states.dart';
 import 'package:elmohadra/features/auth/presentation/blocs/SignUp%20Bloc/bloc/sign_up_bloc.dart';
 import 'package:elmohadra/features/auth/presentation/blocs/SignUp%20Bloc/events/sing_up_bloc_events.dart';
 import 'package:elmohadra/features/auth/presentation/blocs/SignUp%20Bloc/states/sign_up_bloc_states.dart';
@@ -46,6 +47,22 @@ class _SignUpScreenState extends State<SignUpScreen> {
   bool isFromGoogle = false;
   int currentScreen = 0;
   late List<Widget> screens = [];
+
+  @override
+  void initState() {
+    super.initState();
+    final authState = getIt<AuthBloc>().state;
+    if (authState is AuthNewUser && authState.isGoogleSignIn) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        AppToast.show(
+          context: context,
+          title: 'مرحبا بيك يا بطل',
+          description: 'كمل تسجيلك عشان نوصلك للمعركة',
+          type: AppToastType.success,
+        );
+      });
+    }
+  }
 
   @override
   void didChangeDependencies() {
@@ -268,31 +285,47 @@ class _SignUpScreenState extends State<SignUpScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context).colorScheme;
     final isDark = theme.brightness == Brightness.dark;
-    return BlocListener<SignUpBloc, SignUpStates>(
-      listener: (_, state) {
-        if (state is EmailIsExist) {
-          if (state.isExist) {
-            AppToast.show(
-              context: context,
-              title: "errors.auth.email_already_exists".tr(),
-              description: "errors.auth.email_already_exists_sub".tr(),
-              type: AppToastType.error,
-            );
-          } else {
-            setState(() => currentScreen++);
-          }
-        }
-        if (state is SignUpError) {
-          AppToast.show(
-            context: context,
-            title: state.message,
-            type: AppToastType.error,
-          );
-        }
-        if (state is SignUpSuccess) {
-          showSignupToastAndDispatch();
-        }
-      },
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<SignUpBloc, SignUpStates>(
+          listener: (_, state) {
+            if (state is EmailIsExist) {
+              if (state.isExist) {
+                AppToast.show(
+                  context: context,
+                  title: "errors.auth.email_already_exists".tr(),
+                  description: "errors.auth.email_already_exists_sub".tr(),
+                  type: AppToastType.error,
+                );
+              } else {
+                setState(() => currentScreen++);
+              }
+            }
+            if (state is SignUpError) {
+              AppToast.show(
+                context: context,
+                title: state.message,
+                type: AppToastType.error,
+              );
+            }
+            if (state is SignUpSuccess) {
+              showSignupToastAndDispatch();
+            }
+          },
+        ),
+        BlocListener<AuthBloc, AuthStates>(
+          listener: (_, state) {
+            if (state is AuthNewUser && state.isGoogleSignIn) {
+              AppToast.show(
+                context: context,
+                title: 'مرحبا بيك يا بطل',
+                description: 'كمل تسجيلك عشان نوصلك للمعركة',
+                type: AppToastType.success,
+              );
+            }
+          },
+        ),
+      ],
       child: GestureDetector(
         onTap: () => FocusScope.of(context).unfocus(),
         child: Scaffold(

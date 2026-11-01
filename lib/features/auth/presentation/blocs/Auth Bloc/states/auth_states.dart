@@ -25,20 +25,22 @@ class AuthError extends AuthStates {
 
 class AuthAuthenticated extends AuthStates {
   final UserEntity user;
+  final bool isGoogleSignIn;
 
-  AuthAuthenticated({required this.user});
+  AuthAuthenticated({required this.user, this.isGoogleSignIn = false});
 
   @override
-  List<Object?> get props => [user];
+  List<Object?> get props => [user, isGoogleSignIn];
 }
 
 class AuthNewUser extends AuthStates {
   final AuthUserResult user;
+  final bool isGoogleSignIn;
 
-  AuthNewUser({required this.user});
+  AuthNewUser({required this.user, this.isGoogleSignIn = false});
 
   @override
-  List<Object?> get props => [user];
+  List<Object?> get props => [user, isGoogleSignIn];
 }
 
 class AuthUnAuthenticated extends AuthStates {

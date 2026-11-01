@@ -38,13 +38,19 @@ class AuthBloc extends Bloc<AuthEvents, AuthStates> {
 
     on<DeepLinkReceivedEvent>((event, emit) async {
       emit(AuthLoading());
+      // wait for Supabase to register the session locally before fetching the user
       await getIt<SupabaseClient>().auth.onAuthStateChange
           .where((e) => e.event == AuthChangeEvent.signedIn)
           .first;
       final res = await getCurrentUserUsecase(NoParams());
       res.fold((failure) => emit(AuthUnAuthenticated()), (success) {
         if (success.existingUser != null) {
-          emit(AuthAuthenticated(user: success.existingUser!));
+          emit(
+            AuthAuthenticated(
+              user: success.existingUser!,
+              isGoogleSignIn: true,
+            ),
+          );
         } else {
           emit(
             AuthNewUser(
@@ -52,6 +58,7 @@ class AuthBloc extends Bloc<AuthEvents, AuthStates> {
                 newUserId: success.newUserId,
                 newUseremail: success.newUseremail,
               ),
+              isGoogleSignIn: true,
             ),
           );
         }
