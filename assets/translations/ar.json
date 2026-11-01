@@ -11,6 +11,12 @@
   "sign_in_google": "الدخول عن طريق Google",
   "dont_have_account": "معندكش حساب؟ ",
   "create_one": "انشئ حساب",
+  "bottom_nav": {
+    "home": "الرئيسية",
+    "subjects": "المواد",
+    "vault": "المستودع",
+    "profile": "الشخصية"
+  },
   "signup": {
     "header_title": "انشئ حسابك",
     "final_title": "جاهز تبدأ؟",
@@ -72,7 +78,11 @@
     "google_success": "تم الدخول عن طريق Google ✓",
     "google_success_sub": "جاهز تبدأ معركتك؟",
     "signout_success": "اتسجلت برا، إلى اللقاء 👋",
-    "signout_success_sub": "هترجع قريب عارف 😏"
+    "signout_success_sub": "هترجع قريب عارف 😏",
+    "signup_welcome": "أهلاً بيك يا بطل نورت المحاضرة",
+    "signup_welcome_sub": "استكشف المواد وابدأ رحلتك",
+    "google_welcome": "مرحباً بيك يا بطل",
+    "google_welcome_sub": "كمّل تسجيلك عشان نوصلك للمعركة"
   },
   "validation": {
     "required": "هذا الحقل مطلوب",
@@ -84,5 +94,9 @@
     "nickname_no_spaces": "اسم المستخدم لا يحتوي على مسافات",
     "name_min": "الاسم لا يقل عن 3 أحرف",
     "university_min": "اسم الكلية لا يقل عن 3 أحرف"
+  },
+  "retry": "حاول تاني",
+  "characters": {
+    "empty": "مفيش شخصيات متاحة دلوقتي"
   }
 }

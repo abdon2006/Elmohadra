@@ -1,3 +1,4 @@
+import 'package:elmohadra/core/constants/splash_screen.dart';
 import 'package:elmohadra/core/di/injection.dart';
 import 'package:elmohadra/core/routing/app_routes.dart';
 import 'package:elmohadra/core/routing/auth_notifier.dart';
@@ -19,7 +20,7 @@ import 'package:go_router/go_router.dart';
 
 GoRouter appRouter(AuthNotifier authNotifier) {
   return GoRouter(
-    initialLocation: AppRoutes.signin,
+    initialLocation: AppRoutes.splash,
     refreshListenable: authNotifier,
 
     routes: [
@@ -114,14 +115,26 @@ GoRouter appRouter(AuthNotifier authNotifier) {
           ),
         ),
       ),
+
+      GoRoute(
+        path: AppRoutes.splash,
+        name: AppRoutes.splash,
+        builder: (context, state) => SplashScreen(),
+      ),
     ],
 
     redirect: (context, state) {
       final authState = authNotifier.authBloc.state;
       final goingTo = state.matchedLocation;
-      final allowedWhenUnauth = [AppRoutes.signin, AppRoutes.signup];
+      final allowedWhenUnauth = [
+        AppRoutes.signin,
+        AppRoutes.signup,
+        AppRoutes.splash,
+      ];
 
       return switch (authState) {
+        AuthInitial() => null,
+        AuthLoading() => null,
         AuthAuthenticated() =>
           allowedWhenUnauth.contains(goingTo) ? AppRoutes.home : null,
         AuthNewUser(user: var authresult) =>
@@ -140,7 +153,6 @@ GoRouter appRouter(AuthNotifier authNotifier) {
         AuthUnAuthenticated() =>
           allowedWhenUnauth.contains(goingTo) ? null : AppRoutes.signin,
         AuthError() => AppRoutes.signin,
-        _ => null,
       };
     },
   );

@@ -1,7 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:elmohadra/core/constants/app_assets.dart';
 import 'package:elmohadra/core/constants/app_vaildators.dart';
-import 'package:elmohadra/core/di/injection.dart';
 import 'package:elmohadra/core/errors/app_error_mapper.dart';
 import 'package:elmohadra/core/localization/locale_cubit.dart';
 import 'package:elmohadra/core/routing/app_routes.dart';
@@ -61,8 +60,9 @@ class _SignInScreenState extends State<SignInScreen> {
       description: 'toast.signin_success_sub'.tr(),
       type: AppToastType.success,
     );
-    await Future.delayed((Duration(milliseconds: 500)));
-    getIt<AuthBloc>().add(CheckAuthStatusEvent());
+    await Future.delayed(const Duration(milliseconds: 500));
+    if (!mounted) return;
+    context.read<AuthBloc>().add(CheckAuthStatusEvent());
   }
 
   @override

@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:elmohadra/core/widgets/app_toast.dart';
 import 'package:elmohadra/features/auth/presentation/blocs/Auth%20Bloc/bloc/auth_bloc.dart';
 import 'package:elmohadra/features/auth/presentation/blocs/Auth%20Bloc/states/auth_states.dart';
@@ -15,7 +16,8 @@ class HomeScreen extends StatelessWidget {
           if (state is AuthAuthenticated && state.isGoogleSignIn) {
             AppToast.show(
               context: context,
-              title: "تم تسجيل الدخول عن طريق جوجل",
+              title: "toast.google_success".tr(),
+              description: "toast.google_success_sub".tr(),
               type: AppToastType.success,
             );
           }

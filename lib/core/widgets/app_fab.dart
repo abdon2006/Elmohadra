@@ -4,7 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hugeicons/hugeicons.dart';
 
 class AppFab extends StatefulWidget {
-  const new({super.key});
+  const AppFab({super.key});
 
   @override
   State<AppFab> createState() => _AppFabState();

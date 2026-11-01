@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:elmohadra/core/di/injection.dart';
 import 'package:elmohadra/core/usecase/base_usecase.dart';
 import 'package:elmohadra/features/auth/domain/entities/auth_user_result.dart';
@@ -38,10 +40,21 @@ class AuthBloc extends Bloc<AuthEvents, AuthStates> {
 
     on<DeepLinkReceivedEvent>((event, emit) async {
       emit(AuthLoading());
-      // wait for Supabase to register the session locally before fetching the user
-      await getIt<SupabaseClient>().auth.onAuthStateChange
-          .where((e) => e.event == AuthChangeEvent.signedIn)
-          .first;
+      try {
+        // A session may already be restored locally, in which case no
+        // `signedIn` event will ever arrive.
+        final auth = getIt<SupabaseClient>().auth;
+        if (auth.currentSession == null) {
+          await auth.onAuthStateChange
+              .where((e) => e.event == AuthChangeEvent.signedIn)
+              .first
+              .timeout(const Duration(seconds: 10));
+        }
+      } on TimeoutException {
+        emit(AuthUnAuthenticated());
+        return;
+      }
+
       final res = await getCurrentUserUsecase(NoParams());
       res.fold((failure) => emit(AuthUnAuthenticated()), (success) {
         if (success.existingUser != null) {
@@ -66,7 +79,9 @@ class AuthBloc extends Bloc<AuthEvents, AuthStates> {
     });
 
     on<HandleSigningWithGoogleEvent>((event, emit) async {
-      emit(AuthLoading());
+      // The browser takes over from here; the result comes back through the
+      // deep link. Emitting AuthLoading would leave the app stuck if the user
+      // closes the browser without finishing.
       final res = await handleSigningWithGoogleUsecase(NoParams());
       res.fold(
         (failure) => emit(AuthError(message: failure.message)),

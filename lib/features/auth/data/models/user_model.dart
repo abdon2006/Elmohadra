@@ -37,7 +37,10 @@ class UserModel extends UserEntity {
       coins: json['coins'] as int,
       avatarKey: json['avatar_key'] as String,
       createdAt: DateTime.parse(json['created_at'] as String),
-      status: UserStatus.values.byName(json['status'] as String),
+      status: UserStatus.values.firstWhere(
+        (value) => value.name == json['status'],
+        orElse: () => UserStatus.active,
+      ),
     );
   }
 

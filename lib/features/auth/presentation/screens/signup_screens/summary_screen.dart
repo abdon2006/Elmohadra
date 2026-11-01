@@ -8,6 +8,7 @@ import 'package:elmohadra/core/theme/app_shadows.dart';
 import 'package:elmohadra/core/theme/app_spacing.dart';
 import 'package:elmohadra/core/theme/app_typography.dart';
 import 'package:elmohadra/core/widgets/app_animated_entry.dart';
+import 'package:elmohadra/core/widgets/app_network_image.dart';
 import 'package:elmohadra/features/auth/presentation/blocs/signup_cubit/signup_cubit.dart';
 import 'package:elmohadra/features/auth/presentation/blocs/signup_cubit/signup_cubit_state.dart';
 import 'package:elmohadra/features/characters/domain/entities/character_entity.dart';
@@ -33,12 +34,13 @@ class SummaryScreenState extends State<SummaryScreen> {
   @override
   void initState() {
     super.initState();
-    if (mounted) {
-      Future.delayed(Duration(seconds: 5), () {
-        widget.onReady.call();
-        setState(() => isReady = true);
-      });
-    }
+    // Nothing to load here; enable the submit button on the first frame instead
+    // of blocking it behind an artificial delay.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      widget.onReady.call();
+      setState(() => isReady = true);
+    });
   }
 
   @override
@@ -51,11 +53,12 @@ class SummaryScreenState extends State<SummaryScreen> {
         children: [
           BlocBuilder<CharacterBloc, CharacterStates>(
             builder: (context, state) {
-              if (state is GetCharactersSuccess) {
-                final selectedCharacter = state.characters
-                    .where((c) => c.characterKey == cubitState.avatarKey)
-                    .toList()
-                    .first;
+              if (state is GetCharactersSuccess &&
+                  state.characters.isNotEmpty) {
+                final selectedCharacter = _findCharacter(
+                  state.characters,
+                  cubitState.avatarKey,
+                );
                 return Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -80,6 +83,18 @@ class SummaryScreenState extends State<SummaryScreen> {
         ],
       ),
     );
+  }
+
+  /// Falls back to the first character when the stored avatar key is missing or
+  /// no longer exists in the catalogue.
+  CharacterEntity _findCharacter(
+    List<CharacterEntity> characters,
+    String avatarKey,
+  ) {
+    for (final character in characters) {
+      if (character.characterKey == avatarKey) return character;
+    }
+    return characters.first;
   }
 }
 
@@ -110,9 +125,9 @@ Widget buildSelectedCharacterImage({
         ),
         child: ClipOval(
           child: Padding(
-            padding: EdgeInsets.all(3.w), // مسافة أمان صغيرة جوة البوردر
+            padding: EdgeInsets.all(3.w),
             child: ClipOval(
-              child: Image.network(characterImageUrl, fit: BoxFit.cover),
+              child: AppNetworkImage(imageUrl: characterImageUrl),
             ),
           ),
         ),
@@ -126,7 +141,7 @@ Widget buildSelectedCharacterInfo({
   required List<CharacterEntity> characters,
   required BuildContext context,
 }) {
-  bool isArabic = context.read<LocaleCubit>().state.isArabic;
+  bool isArabic = context.watch<LocaleCubit>().state.isArabic;
   return AppAnimatedEntry(
     delay: const Duration(milliseconds: 1200),
     child: AnimatedSwitcher(

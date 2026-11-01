@@ -17,6 +17,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 void main() async {
@@ -57,17 +58,33 @@ class ElmohadraApp extends StatefulWidget {
 }
 
 class _ElmohadraAppState extends State<ElmohadraApp> {
-  late AppLinks appLinks;
-  late StreamSubscription<Uri> appLinksListener;
+  late final AuthNotifier _authNotifier;
+  late final GoRouter _router;
+  late final StreamSubscription<Uri> _appLinksSubscription;
 
   @override
   void initState() {
     super.initState();
+
+    // Created once so a rebuild never recreates the router (which would drop
+    // the navigation stack and leak stream listeners).
+    _authNotifier = AuthNotifier(getIt<AuthBloc>());
+    _router = appRouter(_authNotifier);
+
     context.read<AuthBloc>().add(CheckAuthStatusEvent());
-    appLinks = AppLinks();
-    appLinksListener = appLinks.uriLinkStream.listen((uri) {
+
+    _appLinksSubscription = AppLinks().uriLinkStream.listen((uri) {
+      if (!mounted) return;
       context.read<AuthBloc>().add(DeepLinkReceivedEvent());
     });
+  }
+
+  @override
+  void dispose() {
+    _appLinksSubscription.cancel();
+    _authNotifier.dispose();
+    _router.dispose();
+    super.dispose();
   }
 
   @override
@@ -84,7 +101,7 @@ class _ElmohadraAppState extends State<ElmohadraApp> {
           themeMode: theme.flutterThemeMode,
           debugShowCheckedModeBanner: false,
           title: "المحاضرة",
-          routerConfig: appRouter(AuthNotifier(getIt<AuthBloc>())),
+          routerConfig: _router,
           localizationsDelegates: context.localizationDelegates,
           supportedLocales: context.supportedLocales,
           locale: context.locale,

@@ -38,7 +38,7 @@ class _AppButtonState extends State<AppButton> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    bool Disabled = widget.isLoading || widget.isDisabled!;
+    final bool isDisabled = widget.isLoading || widget.isDisabled!;
     final bool isPrimary = widget.type == AppButtonType.primary;
     final bool isOutline = widget.type == AppButtonType.outline;
     return AnimatedContainer(
@@ -47,7 +47,7 @@ class _AppButtonState extends State<AppButton> {
       width: widget.width ?? double.infinity,
       height: widget.height ?? 50.h,
       child: ElevatedButton(
-        onPressed: Disabled ? null : widget.onTap,
+        onPressed: isDisabled ? null : widget.onTap,
 
         style: ElevatedButton.styleFrom(
           backgroundColor: isPrimary
@@ -87,7 +87,7 @@ class _AppButtonState extends State<AppButton> {
                     curve: Curves.easeInCubic,
                     style: AppTypography.cardTitle(context).copyWith(
                       color: isPrimary
-                          ? Disabled
+                          ? isDisabled
                                 ? isDark
                                       ? AppColors.darkTextMuted
                                       : AppColors.lightTextMuted

@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:elmohadra/core/di/injection.dart';
+import 'package:elmohadra/core/errors/app_error_mapper.dart';
 import 'package:elmohadra/core/localization/locale_cubit.dart';
 import 'package:elmohadra/core/routing/app_routes.dart';
 import 'package:elmohadra/core/theme/app_colors.dart';
@@ -54,10 +55,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
     final authState = getIt<AuthBloc>().state;
     if (authState is AuthNewUser && authState.isGoogleSignIn) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
         AppToast.show(
           context: context,
-          title: 'مرحبا بيك يا بطل',
-          description: 'كمل تسجيلك عشان نوصلك للمعركة',
+          title: 'toast.google_welcome'.tr(),
+          description: 'toast.google_welcome_sub'.tr(),
           type: AppToastType.success,
         );
       });
@@ -167,7 +169,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
       if (currentScreen < screens.length - 1) {
         setState(() => currentScreen++);
       } else {
-        print('Final Signup Data Payload: ${cubit.state}');
         final state = cubit.state;
         context.read<SignUpBloc>().add(
           SignUpEvent(
@@ -272,13 +273,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
   void showSignupToastAndDispatch() async {
     AppToast.show(
       context: context,
-      title: 'اهلا بيك يا بطل نورت المحاضرة',
+      title: 'toast.signup_welcome'.tr(),
+      description: 'toast.signup_welcome_sub'.tr(),
       type: AppToastType.success,
-      description: "استكشف المواد وابدا رحلتك",
     );
-    await Future.delayed(Duration(milliseconds: 500));
+    await Future.delayed(const Duration(milliseconds: 500));
     if (!mounted) return;
-    getIt<AuthBloc>().add(CheckAuthStatusEvent());
+    context.read<AuthBloc>().add(CheckAuthStatusEvent());
   }
 
   @override
@@ -304,7 +305,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
             if (state is SignUpError) {
               AppToast.show(
                 context: context,
-                title: state.message,
+                title: AppErrorTitleMapper.toKey(state.failure).tr(),
+                description: AppErrorDescMapper.toKey(state.failure)?.tr(),
                 type: AppToastType.error,
               );
             }
@@ -318,8 +320,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
             if (state is AuthNewUser && state.isGoogleSignIn) {
               AppToast.show(
                 context: context,
-                title: 'مرحبا بيك يا بطل',
-                description: 'كمل تسجيلك عشان نوصلك للمعركة',
+                title: 'toast.google_welcome'.tr(),
+                description: 'toast.google_welcome_sub'.tr(),
                 type: AppToastType.success,
               );
             }

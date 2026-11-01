@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:elmohadra/core/theme/app_colors.dart';
 import 'package:elmohadra/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
@@ -15,11 +16,11 @@ class AppBottomNav extends StatelessWidget {
   });
 
   static const List<({String labelKey, List<List<dynamic>>? icon})> _items = [
-    (labelKey: 'home', icon: HugeIcons.strokeRoundedHome05),
-    (labelKey: 'subjects', icon: HugeIcons.strokeRoundedGitbook),
+    (labelKey: 'bottom_nav.home', icon: HugeIcons.strokeRoundedHome05),
+    (labelKey: 'bottom_nav.subjects', icon: HugeIcons.strokeRoundedGitbook),
     (labelKey: '', icon: null),
-    (labelKey: 'vault', icon: HugeIcons.strokeRoundedAsteroid01),
-    (labelKey: 'profile', icon: HugeIcons.strokeRoundedUser02),
+    (labelKey: 'bottom_nav.vault', icon: HugeIcons.strokeRoundedAsteroid01),
+    (labelKey: 'bottom_nav.profile', icon: HugeIcons.strokeRoundedUser02),
   ];
 
   @override
@@ -66,7 +67,7 @@ class AppBottomNav extends StatelessWidget {
                                 : theme.onSurface.withValues(alpha: 0.5),
                           ),
                           Text(
-                            item.labelKey,
+                            item.labelKey.tr(),
                             style: AppTypography.bodyMedium(context).copyWith(
                               color: isSelected
                                   ? theme.primary

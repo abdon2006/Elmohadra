@@ -7,6 +7,8 @@ import 'package:elmohadra/core/theme/app_radius.dart';
 import 'package:elmohadra/core/theme/app_spacing.dart';
 import 'package:elmohadra/core/theme/app_typography.dart';
 import 'package:elmohadra/core/widgets/app_animated_entry.dart';
+import 'package:elmohadra/core/widgets/app_button.dart';
+import 'package:elmohadra/core/widgets/app_network_image.dart';
 import 'package:elmohadra/features/characters/domain/entities/character_entity.dart';
 import 'package:elmohadra/features/characters/presentation/bloc/character_bloc.dart';
 import 'package:elmohadra/features/characters/presentation/events/character_event.dart';
@@ -28,7 +30,7 @@ class CharacterChoiceScreen extends StatefulWidget {
 class CharacterChoiceScreenState extends State<CharacterChoiceScreen> {
   List<CharacterEntity> charactersCopy = [];
   int selectedCharacter = 0;
-  late String characterKey;
+  String characterKey = '';
 
   @override
   void initState() {
@@ -37,20 +39,16 @@ class CharacterChoiceScreenState extends State<CharacterChoiceScreen> {
   }
 
   bool validateInputs() {
-    if (charactersCopy.isEmpty) {
+    if (charactersCopy.isEmpty || selectedCharacter >= charactersCopy.length) {
       return false;
     }
-    if (selectedCharacter >= charactersCopy.length) {
-      return false;
-    }
-    return !charactersCopy[selectedCharacter].isLocked;
+    final selected = charactersCopy[selectedCharacter];
+    characterKey = selected.characterKey;
+    return !selected.isLocked;
   }
 
   bool isDisabled() {
-    if (charactersCopy.isEmpty) {
-      return true;
-    }
-    if (selectedCharacter >= charactersCopy.length) {
+    if (charactersCopy.isEmpty || selectedCharacter >= charactersCopy.length) {
       return true;
     }
     return charactersCopy[selectedCharacter].isLocked;
@@ -62,6 +60,12 @@ class CharacterChoiceScreenState extends State<CharacterChoiceScreen> {
       builder: (context, state) {
         if (state is GetCharactersSuccess) {
           final characters = state.characters;
+          if (characters.isEmpty) {
+            return _buildLoadFailure(
+              context: context,
+              message: "characters.empty".tr(),
+            );
+          }
           return Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -113,7 +117,6 @@ class CharacterChoiceScreenState extends State<CharacterChoiceScreen> {
                             i < charactersCopy.length) {
                           characterKey =
                               charactersCopy[selectedCharacter].characterKey;
-                          print(characterKey);
                         }
                         validateInputs();
 
@@ -130,6 +133,14 @@ class CharacterChoiceScreenState extends State<CharacterChoiceScreen> {
             ],
           );
         }
+
+        if (state is CharacterIError) {
+          return _buildLoadFailure(
+            context: context,
+            message: "errors.unknown".tr(),
+          );
+        }
+
         return const Center(child: CircularProgressIndicator());
       },
       listener: (context, state) {
@@ -144,6 +155,35 @@ class CharacterChoiceScreenState extends State<CharacterChoiceScreen> {
           });
         }
       },
+    );
+  }
+
+  Widget _buildLoadFailure({
+    required BuildContext context,
+    required String message,
+  }) {
+    return Center(
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: AppSpacing.lg.w),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: AppTypography.muted(context),
+            ),
+            SizedBox(height: AppSpacing.md.h),
+            AppButton(
+              title: "retry".tr(),
+              onTap: () =>
+                  context.read<CharacterBloc>().add(GetCharactersEvent()),
+              type: AppButtonType.outline,
+              isLoading: false,
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -195,7 +235,7 @@ Widget buildCharacterShip({
             child: Stack(
               fit: StackFit.expand,
               children: [
-                Image.network(character.imageUrl, fit: BoxFit.cover),
+                AppNetworkImage(imageUrl: character.imageUrl),
                 if (isLocked)
                   Container(
                     decoration: BoxDecoration(
@@ -223,7 +263,7 @@ Widget _buildSelectedCharacterInfo({
   required List<CharacterEntity> characters,
   required BuildContext context,
 }) {
-  bool isArabic = context.read<LocaleCubit>().state.isArabic;
+  bool isArabic = context.watch<LocaleCubit>().state.isArabic;
   return AppAnimatedEntry(
     delay: const Duration(milliseconds: 500),
     child: AnimatedSwitcher(
@@ -301,9 +341,8 @@ Widget _buildSelectedCharacterImage({
           child: Padding(
             padding: EdgeInsets.all(3.w),
             child: ClipOval(
-              child: Image.network(
-                characters[selectedCharacter].imageUrl,
-                fit: BoxFit.cover,
+              child: AppNetworkImage(
+                imageUrl: characters[selectedCharacter].imageUrl,
               ),
             ),
           ),

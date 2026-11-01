@@ -11,6 +11,12 @@
   "sign_in_google": "Continue with Google",
   "dont_have_account": "Don't have an account? ",
   "create_one": "Create one",
+  "bottom_nav": {
+    "home": "Home",
+    "subjects": "Subjects",
+    "vault": "Vault",
+    "profile": "Profile"
+  },
   "signup": {
     "header_title": "Create Account",
     "final_title": "Ready to start?",
@@ -72,6 +78,25 @@
     "google_success": "Signed in with Google ✓",
     "google_success_sub": "Ready for your first battle?",
     "signout_success": "Signed out, see you soon 👋",
-    "signout_success_sub": "You'll be back 😏"
+    "signout_success_sub": "You'll be back 😏",
+    "signup_welcome": "Welcome aboard, champion!",
+    "signup_welcome_sub": "Explore your subjects and start the journey",
+    "google_welcome": "Welcome, champion!",
+    "google_welcome_sub": "Finish your sign up to enter the arena"
+  },
+  "retry": "Try again",
+  "characters": {
+    "empty": "No characters available right now"
+  },
+  "validation": {
+    "required": "This field is required",
+    "invalid_email": "Invalid email address",
+    "password_length": "Password must be at least 8 characters",
+    "password_format": "Password must contain a letter and a number",
+    "nickname_min": "Nickname must be at least 3 characters",
+    "nickname_max": "Nickname must be at most 20 characters",
+    "nickname_no_spaces": "Nickname cannot contain spaces",
+    "name_min": "Name must be at least 3 characters",
+    "university_min": "University name must be at least 3 characters"
   }
 }
