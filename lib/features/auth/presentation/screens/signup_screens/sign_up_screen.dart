@@ -259,7 +259,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
       type: AppToastType.success,
       description: "استكشف المواد وابدا رحلتك",
     );
-    await Future.delayed(Duration(seconds: 1));
+    await Future.delayed(Duration(milliseconds: 500));
+    if (!mounted) return;
     getIt<AuthBloc>().add(CheckAuthStatusEvent());
   }
 
@@ -288,7 +289,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
             type: AppToastType.error,
           );
         }
-        if (state is SignUpSuccess) {}
+        if (state is SignUpSuccess) {
+          showSignupToastAndDispatch();
+        }
       },
       child: GestureDetector(
         onTap: () => FocusScope.of(context).unfocus(),

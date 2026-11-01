@@ -61,7 +61,7 @@ class _SignInScreenState extends State<SignInScreen> {
       description: 'toast.signin_success_sub'.tr(),
       type: AppToastType.success,
     );
-    await Future.delayed((Duration(seconds: 1)));
+    await Future.delayed((Duration(milliseconds: 500)));
     getIt<AuthBloc>().add(CheckAuthStatusEvent());
   }
 
