@@ -10,8 +10,10 @@ import 'package:elmohadra/core/routing/auth_notifier.dart';
 import 'package:elmohadra/core/supabase/supabase_config.dart';
 import 'package:elmohadra/core/theme/app_theme.dart';
 import 'package:elmohadra/core/theme/theme_cubit.dart';
+import 'package:elmohadra/core/widgets/app_toast.dart';
 import 'package:elmohadra/features/auth/presentation/blocs/Auth%20Bloc/bloc/auth_bloc.dart';
 import 'package:elmohadra/features/auth/presentation/blocs/Auth%20Bloc/events/auth_events.dart';
+import 'package:elmohadra/features/auth/presentation/blocs/Auth%20Bloc/states/auth_states.dart';
 import 'package:elmohadra/features/characters/presentation/bloc/character_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -19,6 +21,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:toastification/toastification.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -95,16 +98,34 @@ class _ElmohadraAppState extends State<ElmohadraApp> {
       splitScreenMode: true,
       builder: (context, child) {
         final theme = context.watch<ThemeCubit>().state;
-        return MaterialApp.router(
-          theme: AppTheme.light(context),
-          darkTheme: AppTheme.dark(context),
-          themeMode: theme.flutterThemeMode,
-          debugShowCheckedModeBanner: false,
-          title: "المحاضرة",
-          routerConfig: _router,
-          localizationsDelegates: context.localizationDelegates,
-          supportedLocales: context.supportedLocales,
-          locale: context.locale,
+        return ToastificationWrapper(
+          child: MaterialApp.router(
+            theme: AppTheme.light(context),
+            darkTheme: AppTheme.dark(context),
+            themeMode: theme.flutterThemeMode,
+            debugShowCheckedModeBanner: false,
+            title: "المحاضرة",
+            routerConfig: _router,
+            localizationsDelegates: context.localizationDelegates,
+            supportedLocales: context.supportedLocales,
+            locale: context.locale,
+            // Single source of truth for auth-driven toasts: the root listener
+            // exists before any screen is built, so it catches state changes
+            // that happen before navigation (e.g. a Google deep link).
+            builder: (context, child) => BlocListener<AuthBloc, AuthStates>(
+              listener: (context, state) {
+                if (state is AuthNewUser && state.isGoogleSignIn) {
+                  AppToast.show(
+                    context: context,
+                    title: 'toast.google_welcome'.tr(),
+                    description: 'toast.google_welcome_sub'.tr(),
+                    type: AppToastType.success,
+                  );
+                }
+              },
+              child: child ?? const SizedBox.shrink(),
+            ),
+          ),
         );
       },
     );

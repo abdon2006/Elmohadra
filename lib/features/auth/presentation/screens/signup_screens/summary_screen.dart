@@ -34,8 +34,6 @@ class SummaryScreenState extends State<SummaryScreen> {
   @override
   void initState() {
     super.initState();
-    // Nothing to load here; enable the submit button on the first frame instead
-    // of blocking it behind an artificial delay.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       widget.onReady.call();

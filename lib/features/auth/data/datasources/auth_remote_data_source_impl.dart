@@ -50,6 +50,7 @@ class AuthRemoteDataSourceImpl extends AuthRemoteDataSource {
   Future<UserModel> signUpWithEmail(SignupParams params) async {
     final String userId;
 
+    /// case 1 : normal signup
     if (params.password != null) {
       final res = await supabaseClient.auth.signUp(
         password: params.password!,
@@ -61,7 +62,9 @@ class AuthRemoteDataSourceImpl extends AuthRemoteDataSource {
         throw AuthException('signup_failed', code: 'signup_failed');
       }
       userId = user.id;
-    } else {
+    }
+    /// case 2 : google signup (new account)
+    else {
       final user = supabaseClient.auth.currentUser;
       if (user == null) {
         throw AuthException('user_not_found', code: 'user_not_found');

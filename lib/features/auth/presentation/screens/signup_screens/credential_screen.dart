@@ -19,7 +19,6 @@ class CredentialScreen extends StatefulWidget {
 class CredentialScreenState extends State<CredentialScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passController = TextEditingController();
-  final _formKey = GlobalKey<FormState>();
   String? _emailError;
   String? _passError;
 
@@ -57,59 +56,56 @@ class CredentialScreenState extends State<CredentialScreen> {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      child: Form(
-        key: _formKey,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            AppAnimatedEntry(
-              delay: Duration(milliseconds: 100),
-              child: Text(
-                "signup.step1.title".tr(),
-                style: AppTypography.screenTitle(context)
-                    .copyWith(fontSize: 32.sp),
-              ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          AppAnimatedEntry(
+            delay: Duration(milliseconds: 100),
+            child: Text(
+              "signup.step1.title".tr(),
+              style: AppTypography.screenTitle(context)
+                  .copyWith(fontSize: 32.sp),
             ),
-            AppAnimatedEntry(
-              delay: Duration(milliseconds: 300),
-              child: Text(
-                "signup.step1.subtitle".tr(),
-                style: AppTypography.muted(context).copyWith(fontSize: 16.sp),
-              ),
+          ),
+          AppAnimatedEntry(
+            delay: Duration(milliseconds: 300),
+            child: Text(
+              "signup.step1.subtitle".tr(),
+              style: AppTypography.muted(context).copyWith(fontSize: 16.sp),
             ),
+          ),
 
-            Padding(
-              padding: EdgeInsets.symmetric(vertical: AppSpacing.lg.h),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  AppAnimatedEntry(
-                    delay: Duration(milliseconds: 500),
-                    child: AppTextField(
-                      hint: "signup.step1.email_hint".tr(),
-                      label: "signup.step1.email_label".tr(),
-                      isPass: false,
-                      controller: emailController,
-                      errorText: _emailError,
-                    ),
+          Padding(
+            padding: EdgeInsets.symmetric(vertical: AppSpacing.lg.h),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                AppAnimatedEntry(
+                  delay: Duration(milliseconds: 500),
+                  child: AppTextField(
+                    hint: "signup.step1.email_hint".tr(),
+                    label: "signup.step1.email_label".tr(),
+                    isPass: false,
+                    controller: emailController,
+                    errorText: _emailError,
                   ),
-                  SizedBox(height: AppSpacing.md.h),
-                  AppAnimatedEntry(
-                    delay: Duration(milliseconds: 700),
-                    child: AppTextField(
-                      hint: "signup.step1.password_hint".tr(),
-                      label: "signup.step1.password_label".tr(),
-                      isPass: true,
-                      controller: passController,
-                      errorText: _passError,
-                    ),
+                ),
+                SizedBox(height: AppSpacing.md.h),
+                AppAnimatedEntry(
+                  delay: Duration(milliseconds: 700),
+                  child: AppTextField(
+                    hint: "signup.step1.password_hint".tr(),
+                    label: "signup.step1.password_label".tr(),
+                    isPass: true,
+                    controller: passController,
+                    errorText: _passError,
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

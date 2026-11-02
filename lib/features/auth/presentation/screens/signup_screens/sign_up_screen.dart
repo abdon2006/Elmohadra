@@ -1,5 +1,4 @@
 import 'package:easy_localization/easy_localization.dart';
-import 'package:elmohadra/core/di/injection.dart';
 import 'package:elmohadra/core/errors/app_error_mapper.dart';
 import 'package:elmohadra/core/localization/locale_cubit.dart';
 import 'package:elmohadra/core/routing/app_routes.dart';
@@ -14,7 +13,6 @@ import 'package:elmohadra/core/widgets/divider_with_icon.dart';
 import 'package:elmohadra/features/auth/domain/usecases/prams%20classes/signup_params.dart';
 import 'package:elmohadra/features/auth/presentation/blocs/Auth%20Bloc/bloc/auth_bloc.dart';
 import 'package:elmohadra/features/auth/presentation/blocs/Auth%20Bloc/events/auth_events.dart';
-import 'package:elmohadra/features/auth/presentation/blocs/Auth%20Bloc/states/auth_states.dart';
 import 'package:elmohadra/features/auth/presentation/blocs/SignUp%20Bloc/bloc/sign_up_bloc.dart';
 import 'package:elmohadra/features/auth/presentation/blocs/SignUp%20Bloc/events/sing_up_bloc_events.dart';
 import 'package:elmohadra/features/auth/presentation/blocs/SignUp%20Bloc/states/sign_up_bloc_states.dart';
@@ -48,23 +46,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
   bool isFromGoogle = false;
   int currentScreen = 0;
   late List<Widget> screens = [];
-
-  @override
-  void initState() {
-    super.initState();
-    final authState = getIt<AuthBloc>().state;
-    if (authState is AuthNewUser && authState.isGoogleSignIn) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (!mounted) return;
-        AppToast.show(
-          context: context,
-          title: 'toast.google_welcome'.tr(),
-          description: 'toast.google_welcome_sub'.tr(),
-          type: AppToastType.success,
-        );
-      });
-    }
-  }
 
   @override
   void didChangeDependencies() {
@@ -169,6 +150,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       if (currentScreen < screens.length - 1) {
         setState(() => currentScreen++);
       } else {
+        /// if in the last screen 'summary' dispatch the signup event
         final state = cubit.state;
         context.read<SignUpBloc>().add(
           SignUpEvent(
@@ -286,48 +268,33 @@ class _SignUpScreenState extends State<SignUpScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context).colorScheme;
     final isDark = theme.brightness == Brightness.dark;
-    return MultiBlocListener(
-      listeners: [
-        BlocListener<SignUpBloc, SignUpStates>(
-          listener: (_, state) {
-            if (state is EmailIsExist) {
-              if (state.isExist) {
-                AppToast.show(
-                  context: context,
-                  title: "errors.auth.email_already_exists".tr(),
-                  description: "errors.auth.email_already_exists_sub".tr(),
-                  type: AppToastType.error,
-                );
-              } else {
-                setState(() => currentScreen++);
-              }
-            }
-            if (state is SignUpError) {
-              AppToast.show(
-                context: context,
-                title: AppErrorTitleMapper.toKey(state.failure).tr(),
-                description: AppErrorDescMapper.toKey(state.failure)?.tr(),
-                type: AppToastType.error,
-              );
-            }
-            if (state is SignUpSuccess) {
-              showSignupToastAndDispatch();
-            }
-          },
-        ),
-        BlocListener<AuthBloc, AuthStates>(
-          listener: (_, state) {
-            if (state is AuthNewUser && state.isGoogleSignIn) {
-              AppToast.show(
-                context: context,
-                title: 'toast.google_welcome'.tr(),
-                description: 'toast.google_welcome_sub'.tr(),
-                type: AppToastType.success,
-              );
-            }
-          },
-        ),
-      ],
+    return BlocListener<SignUpBloc, SignUpStates>(
+      listener: (_, state) {
+        if (state is EmailIsExist) {
+          if (state.isExist) {
+            AppToast.show(
+              context: context,
+              title: "errors.auth.email_already_exists".tr(),
+              description: "errors.auth.email_already_exists_sub".tr(),
+              type: AppToastType.error,
+            );
+          } else {
+            /// here we make the step because we end the function 'handle tap per event ' to wait the server response
+            setState(() => currentScreen++);
+          }
+        }
+        if (state is SignUpError) {
+          AppToast.show(
+            context: context,
+            title: AppErrorTitleMapper.toKey(state.failure).tr(),
+            description: AppErrorDescMapper.toKey(state.failure)?.tr(),
+            type: AppToastType.error,
+          );
+        }
+        if (state is SignUpSuccess) {
+          showSignupToastAndDispatch();
+        }
+      },
       child: GestureDetector(
         onTap: () => FocusScope.of(context).unfocus(),
         child: Scaffold(

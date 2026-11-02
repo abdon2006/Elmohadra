@@ -22,7 +22,7 @@ class SigninBlocError extends SignInBlocStates {
   SigninBlocError({required this.message, required this.failure});
 
   @override
-  List<Object?> get props => [message];
+  List<Object?> get props => [message, failure];
 }
 
 class SigninBlocSuccess extends SignInBlocStates {

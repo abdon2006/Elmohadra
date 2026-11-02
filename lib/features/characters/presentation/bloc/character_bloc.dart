@@ -16,7 +16,7 @@ class CharacterBloc extends Bloc<CharacterEvents, CharacterStates> {
 
       final res = await getCharactersUsecase(NoParams());
       res.fold(
-        (l) => emit(CharacterIError(l.message, l)),
+        (l) => emit(CharacterIError(message: l.message, failure: l)),
         (r) => emit(GetCharactersSuccess(characters: r)),
       );
     });

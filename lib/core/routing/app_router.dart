@@ -1,4 +1,4 @@
-import 'package:elmohadra/core/constants/splash_screen.dart';
+import 'package:elmohadra/core/widgets/splash_screen.dart';
 import 'package:elmohadra/core/di/injection.dart';
 import 'package:elmohadra/core/routing/app_routes.dart';
 import 'package:elmohadra/core/routing/auth_notifier.dart';
@@ -126,11 +126,7 @@ GoRouter appRouter(AuthNotifier authNotifier) {
     redirect: (context, state) {
       final authState = authNotifier.authBloc.state;
       final goingTo = state.matchedLocation;
-      final allowedWhenUnauth = [
-        AppRoutes.signin,
-        AppRoutes.signup,
-        AppRoutes.splash,
-      ];
+      final allowedWhenUnauth = [AppRoutes.signin, AppRoutes.signup];
 
       return switch (authState) {
         AuthInitial() => null,

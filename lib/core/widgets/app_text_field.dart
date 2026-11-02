@@ -13,7 +13,6 @@ class AppTextField extends StatefulWidget {
   final TextEditingController controller;
   final IconData? prefixIcon;
   final TextInputType? keyboardType;
-  final String? Function(String?)? validator;
   final String? errorText;
 
   const AppTextField({
@@ -24,7 +23,6 @@ class AppTextField extends StatefulWidget {
     required this.controller,
     this.prefixIcon,
     this.keyboardType,
-    this.validator,
     this.errorText,
   });
 
@@ -91,10 +89,9 @@ class _AppTextFieldState extends State<AppTextField> {
                   ]
                 : [],
           ),
-          child: TextFormField(
+          child: TextField(
             controller: widget.controller,
             focusNode: _focusNode,
-            validator: widget.validator,
             obscureText: widget.isPass ? _obscure : false,
             keyboardType: widget.keyboardType,
             style: AppTypography.bodyMedium(context),

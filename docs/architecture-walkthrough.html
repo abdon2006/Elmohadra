@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+<meta charset="utf-8">
+<title>ElMohadra — Architecture Walkthrough</title>
+<style>
+  @page { size: A4; margin: 18mm 16mm; }
+  body {
+    font-family: "Noto Sans Arabic", "DejaVu Sans", sans-serif;
+    direction: rtl; text-align: right;
+    font-size: 11.5pt; line-height: 1.85; color: #111;
+  }
+  h1 { font-size: 22pt; color: #0B1F44; border-bottom: 3px solid #FF3B3B; padding-bottom: 6px; }
+  h2 { font-size: 16pt; color: #1B3A6B; margin-top: 26px; border-right: 5px solid #FF3B3B; padding-right: 10px; }
+  h3 { font-size: 13pt; color: #0B1F44; margin-top: 18px; }
+  code, pre { font-family: "DejaVu Sans Mono", monospace; direction: ltr; text-align: left; }
+  code { background: #F1F3F7; padding: 1px 4px; border-radius: 3px; font-size: 9.5pt; }
+  pre { background: #F7F8FA; border: 1px solid #D8DEE9; border-radius: 6px; padding: 10px; font-size: 9pt; line-height: 1.5; white-space: pre-wrap; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; font-size: 10pt; }
+  th, td { border: 1px solid #C9D2E0; padding: 6px 8px; vertical-align: top; }
+  th { background: #0B1F44; color: #fff; }
+  tr:nth-child(even) td { background: #F4F6FA; }
+  .note { background: #FFF6E5; border-right: 5px solid #F0A500; padding: 8px 12px; margin: 12px 0; }
+  .warn { background: #FDECEC; border-right: 5px solid #FF3B3B; padding: 8px 12px; margin: 12px 0; }
+  .ok { background: #EAF9F0; border-right: 5px solid #2ECC71; padding: 8px 12px; margin: 12px 0; }
+  ul, ol { padding-right: 22px; }
+</style>
+</head>
+<body>
+
+<h1>المحاضرة — شرح الكود بالتفصيل</h1>
+<p>مرجع فني: كل ملف بيعمل إيه، مين بينادي مين، النوع اللي بيرجع، والكاستينج. مكتوب للكود بعد الـ P0 pass.</p>
+
+<h2>0) الصورة الكبيرة</h2>
+<p>Clean Architecture + Feature-first. الاتجاه: <code>Presentation → Domain → Data</code>. الـ Presentation ميعرفش Supabase، والـ Domain ميعرفش مين بينفذ، والـ Data هو الوحيد اللي بيتكلم مع السيرفر.</p>
+<h3>قاعدة 1: Either&lt;Failure, T&gt;</h3>
+<pre>res.fold(
+  (failure) =&gt; ... , // Left
+  (data)    =&gt; ... , // Right
+);</pre>
+<p>معناها: دالة واحدة بتتنفذ، حسب الحالة. كل repository بيرجع Either، ومفيش exception بيطلع برّه الـ data layer.</p>
+<h3>قاعدة 2: States sealed + Equatable</h3>
+<p><code>sealed</code> بتخلي الـ switch إجباري يغطي كل الحالات. <code>Equatable</code> بتخلي البلوك ميبعتش state مساوية للقديمة.</p>
+
+<h2>1) main.dart — من أول نفس</h2>
+<ol>
+  <li><b>WidgetsFlutterBinding.ensureInitialized()</b>: تشغيل الـ engine قبل أي await.</li>
+  <li><b>ScreenUtil.ensureScreenSize()</b>: قراءة أبعاد الشاشة قبل أول frame، عشان <code>.w/.h/.sp</code> تشتغل.</li>
+  <li><b>Supabase.initialize(url, publishableKey)</b>: اتصال + إنشاء <code>Supabase.instance.client</code> + قراءة الـ session المحفوظة + تشغيل <code>onAuthStateChange</code>.</li>
+  <li><b>Bloc.observer</b>: لوجات debug فقط، أنواع الأحداث مش محتواها (الباسورد مش بيتطبع).</li>
+  <li><b>EasyLocalization.ensureInitialized()</b>: تحميل الترجمات واللغة المحفوظة (المفتاح <code>locale</code>).</li>
+  <li><b>configureDependencies()</b>: <code>getIt.init()</code> — تسجيل كل الكلاسات من <code>injection.config.dart</code>.</li>
+  <li><b>runApp</b>: EasyLocalization → MultiBlocProvider (Locale, Theme, Auth, Character) → ElmohadraApp.</li>
+</ol>
+<h3>ElmohadraApp.initState</h3>
+<pre>_authNotifier = AuthNotifier(getIt&lt;AuthBloc&gt;());
+_router = appRouter(_authNotifier);
+context.read&lt;AuthBloc&gt;().add(CheckAuthStatusEvent());
+AppLinks().uriLinkStream.listen(... DeepLinkReceivedEvent ...);</pre>
+<p>الـ router والـ notifier بيتعملوا مرة واحدة، و<code>dispose</code> بيقفلهم ويلغي الـ subscription.</p>
+<h3>build</h3>
+<pre>ScreenUtilInit(designSize: Size(390, 900)) → MaterialApp.router(
+  theme: AppTheme.light, darkTheme: AppTheme.dark,
+  themeMode: context.watch&lt;ThemeCubit&gt;().state.flutterThemeMode,
+  routerConfig: _router,
+  locale: context.locale,
+)</pre>
+<p><code>.w</code> = القيمة × عرض الشاشة ÷ 390، و<code>.h</code> بنسبة 900، و<code>.sp</code> للنص مع minTextAdapt.</p>
+
+<h2>2) الراوتينج</h2>
+<h3>GoRouter</h3>
+<ul>
+  <li><code>initialLocation: /splash</code>.</li>
+  <li><code>refreshListenable: authNotifier</code>: أي state جديد للـ AuthBloc → إعادة تقييم redirect. مفيش <code>context.go</code> بعد تسجيل الدخول.</li>
+  <li>ShellRoute بتحيط 4 صفحات بـ MainShell (BottomNav + FAB ثابتين).</li>
+  <li>signin/signup/splash برّه الـ shell، وكل واحد بيعمل البلوكات بتاعته.</li>
+  <li><code>buildPageTransition</code>: CustomTransitionPage، fade + scale (1.15 → 0.98 → 1.0) في 280ms.</li>
+</ul>
+<h3>جدول GoRouterState</h3>
+<table>
+<tr><th>الخاصية</th><th>النوع</th><th>المعنى بدقة</th><th>مثال على /signup?email=a@b.com</th></tr>
+<tr><td><code>state.uri</code></td><td>Uri</td><td>العنوان الكامل مع query</td><td>/signup?email=a@b.com</td></tr>
+<tr><td><code>state.matchedLocation</code></td><td>String</td><td>المسار الذي تمت مطابقته، بدون query ولا fragment</td><td>/signup</td></tr>
+<tr><td><code>state.fullPath</code></td><td>String?</td><td>نمط الراوت كما هو معرّف (بالـ :params)</td><td>/signup</td></tr>
+<tr><td><code>state.pathParameters</code></td><td>Map&lt;String,String&gt;</td><td>قيم :id من النمط</td><td>{}</td></tr>
+<tr><td><code>state.queryParameters</code></td><td>Map&lt;String,String&gt;</td><td>قيم بعد علامة ؟</td><td>{email: a@b.com}</td></tr>
+<tr><td><code>state.extra</code></td><td>Object?</td><td>كائن عشوائي يُمرر مع go(extra:) ولا يبقى بعد إعادة التشغيل</td><td>—</td></tr>
+<tr><td><code>state.name</code></td><td>String?</td><td>اسم الراوت</td><td>signup</td></tr>
+</table>
+<h3>دلالات redirect بدقة</h3>
+<ul>
+  <li>التوقيع: <code>FutureOr&lt;String?&gt; Function(BuildContext, GoRouterState)</code>.</li>
+  <li>بيتنفذ: عند البداية، عند كل go/push، وعند كل notify من refreshListenable.</li>
+  <li><code>null</code> = اسمح/خليك مكانك. <code>String</code> أو <code>Uri</code> = انتقل لهناك (وتعاد دورة redirect على الهدف).</li>
+  <li>لو رجّعت نفس المكان: GoRouter بيعتبرها لا تغيير لمنع الحلقة.</li>
+  <li>الـ state اللي بتوصلك هي <b>الهدف</b> مش الشاشة الحالية.</li>
+  <li>الترتيب: redirect العام أولاً، ثم redirect الخاص بالراوت.</li>
+</ul>
+<div class="warn">خطأ شائع: المقارنة بـ <code>state.uri.toString()</code> بدل <code>matchedLocation</code> — الـ query بيلخبط المقارنة وتدخل حلقة redirect.</div>
+<h3>منطق التطبيق</h3>
+<table>
+<tr><th>الحالة</th><th>النتيجة</th></tr>
+<tr><td>AuthInitial / AuthLoading</td><td>null (سيب المستخدم مكانه)</td></tr>
+<tr><td>AuthAuthenticated</td><td>لو رايح signin/signup → /home</td></tr>
+<tr><td>AuthNewUser</td><td>لو مش على signin/signup → /signup?email=..&amp;id=..</td></tr>
+<tr><td>AuthUnAuthenticated</td><td>لو مش على signin/signup → /signin</td></tr>
+<tr><td>AuthError</td><td>/signin</td></tr>
+</table>
+
+<h2>3) طبقة الـ Domain</h2>
+<ul>
+  <li><b>UserEntity</b>: بيانات المستخدم + <code>UserStatus {active, banned}</code>، Equatable.</li>
+  <li><b>AuthUserResult</b>: existingUser / newUserId / newUseremail — حاملة قرار للـ AuthBloc.</li>
+  <li><b>SigninParams / SignupParams</b>: باراميترات (password nullable لمستخدمي جوجل).</li>
+  <li><b>BaseUsecase&lt;R,P&gt;</b> + <code>NoParams</code>: كل usecase بيimplement <code>call</code> فيبقى قابل للنداء كدالة.</li>
+  <li><b>AuthRepository</b>: 7 دوال كلها <code>Future&lt;Either&lt;Failure, X&gt;&gt;</code>.</li>
+</ul>
+
+<h2>4) طبقة الـ Data والكاستينج</h2>
+<h3>UserModel.fromJson</h3>
+<pre>id: json['id'] as String,
+academicYear: json['academic_year'] as int,
+createdAt: DateTime.parse(json['created_at'] as String),
+status: UserStatus.values.firstWhere((v) =&gt; v.name == json['status'],
+        orElse: () =&gt; UserStatus.active),</pre>
+<p>القيم من Supabase هي <code>dynamic</code>؛ <code>as</code> كاست صارم بيرمي TypeError لو النوع مختلف. الوصول لـ <code>Map</code> واحد بـ <code>maybeSingle()</code> أنضف من <code>res[0]</code>.</p>
+<h3>signInWithEmail</h3>
+<pre>auth.signInWithPassword(...) → res.user
+if (user == null) throw AuthException(code: 'invalid_credentials')
+profile = _fetchProfile(user.id)  // users.maybeSingle
+if (profile == null) throw AuthException(code: 'user_not_found')</pre>
+<h3>signUpWithEmail</h3>
+<pre>password != null ? auth.signUp(...) : currentUser.id   // جوجل
+if (currentSession == null) throw AuthException(code: 'email_not_confirmed')
+users.insert({...}).select().single() → UserModel</pre>
+<div class="warn">الأعمدة level/xp/coins/... بتيجي من العميل. RLS بتحمي الصفوف مش القيم. الحل: defaults + trigger + منع الكتابة في أعمدة اللعب.</div>
+<h3>checkEmailIsExist</h3>
+<pre>functions.invoke('check-email-exists', body: {'email': email})
+return res.data['exists'] as bool;</pre>
+<h3>AuthRepositoryImpl._guard</h3>
+<pre>Future&lt;Either&lt;Failure, T&gt;&gt; _guard&lt;T&gt;(Future&lt;T&gt; Function() call) async {
+  try { return Right(await call()); }
+  catch (e) { return Left(FailureMapper.map(e)); }
+}</pre>
+<table>
+<tr><th>Exception</th><th>Failure</th></tr>
+<tr><td>AuthException</td><td>AuthFailure(code)</td></tr>
+<tr><td>PostgrestException / StorageException</td><td>ServerFailure</td></tr>
+<tr><td>SocketException</td><td>NetworkFailure</td></tr>
+<tr><td>أي حاجة تانية</td><td>ServerFailure</td></tr>
+</table>
+
+<h2>5) AuthBloc</h2>
+<table>
+<tr><th>Event</th><th>اللي بيحصل</th></tr>
+<tr><td>CheckAuthStatusEvent</td><td>Loading → getCurrentUser → Authenticated / NewUser / UnAuthenticated</td></tr>
+<tr><td>DeepLinkReceivedEvent</td><td>Loading → (لو مفيش session: انتظار signedIn بـ timeout 10s) → getCurrentUser → نفس القرار مع isGoogleSignIn</td></tr>
+<tr><td>HandleSigningWithGoogleEvent</td><td>فتح البراوزر، بدون Loading (لو المستخدم قفل البراوزر ميفضلش معلق)</td></tr>
+<tr><td>SignOutEvent</td><td>Loading → signOut → UnAuthenticated</td></tr>
+</table>
+
+<h2>6) تسجيل الدخول</h2>
+<pre>onTap → AppValidators → SignInEvent(SigninParams)
+→ SigninWithEmailUsecase → AuthRepository._guard → datasource → Supabase
+→ Right/Left → SigninBlocSuccess/SigninBlocError
+→ toast + 500ms + CheckAuthStatusEvent
+→ AuthAuthenticated → redirect /home</pre>
+
+<h2>7) Signup Wizard</h2>
+<p>شاشة واحدة، <code>currentScreen</code> int، و<code>AnimatedSwitcher</code>. كل خطوة StatefulWidget مكشوف الـ State، والأب بيمسكها بـ <code>GlobalKey&lt;XState&gt;</code> وينادي <code>validateInputs()</code> / <code>isDisabled()</code>.</p>
+<pre>didChangeDependencies:
+  uri = GoRouterState.of(context).uri
+  isGoogle = email/id موجودين في queryParameters
+  google → [Name, Uni, Character, Summary]
+  عادي  → [Credential, Name, Uni, Character, Summary]</pre>
+<h3>زرار التالي</h3>
+<pre>isValidated → update الـ Cubit → currentScreen++
+Credential استثناء: CheckEmailIsExist → listener يتقدم عند isExist == false
+آخر خطوة: SignUpEvent(SignupParams) → SignupWithEmailUsecase → ... → SignUpSuccess</pre>
+<h3>ليه didChangeDependencies مش initState</h3>
+<p>لأن <code>GoRouterState.of(context)</code> بيتسجل كاعتماد على InheritedWidget. في <code>initState</code> الاعتماد على InheritedWidget ممنوع (assert). الحل: didChangeDependencies مع حارس <code>if (screens.isEmpty)</code> لأنها بتتنادى أكتر من مرة.</p>
+
+<h2>8) feature الشخصيات</h2>
+<pre>initState → CharacterBloc.add(GetCharactersEvent)
+→ CharacterLoading → GetCharactersUsecase(NoParams) → repo → datasource
+→ from('characters').select() → List&lt;Map&gt;
+→ .map(CharacterModel.fromJson).toList() → List&lt;CharacterModel&gt;
+→ Right(List&lt;CharacterEntity&gt;)  // covariance
+→ GetCharactersSuccess / CharacterIError</pre>
+<p>الشاشة: grid 3 أعمدة، الشخصية المقفولة عليها طبقة سوداء + قفل، والزرار بيتقفل. الصور عبر <code>AppNetworkImage</code> (placeholder + error).</p>
+
+<h2>9) طبقة core</h2>
+<table>
+<tr><th>الملف</th><th>المحتوى</th></tr>
+<tr><td>app_colors</td><td>ألوان dark/light + accent/success/warning/error</td></tr>
+<tr><td>app_typography</td><td>Lalezar/Cairo للعربي وRusso One/Exo 2 للإنجليزي، كلها .sp</td></tr>
+<tr><td>app_spacing</td><td>4 / 8 / 16 / 24 / 32 / 48</td></tr>
+<tr><td>app_radius</td><td>8 / 16 / 24 / 32 / 100</td></tr>
+<tr><td>app_duration / app_curves / app_shadows</td><td>توكنز الحركة والظل</td></tr>
+<tr><td>app_theme</td><td>ColorScheme صريح + cardTheme + appBarTheme</td></tr>
+<tr><td>locale_cubit / theme_cubit</td><td>حفظ في SharedPreferences + emit</td></tr>
+<tr><td>AppTextField</td><td>FocusNode + border متحرك + إظهار/إخفاء الباسورد + errorText خارجي</td></tr>
+<tr><td>AppButton</td><td>3 أنواع + isLoading + isDisabled</td></tr>
+<tr><td>AppToast</td><td>toastification.showCustom</td></tr>
+<tr><td>AppAnimatedEntry</td><td>fade + slide مع delay</td></tr>
+<tr><td>AppNetworkImage</td><td>CachedNetworkImage + placeholder + error</td></tr>
+</table>
+
+<h2>10) جدول الكاستينج</h2>
+<table>
+<tr><th>من</th><th>إلى</th><th>الطريقة</th></tr>
+<tr><td>Map&lt;String,dynamic&gt;</td><td>UserModel</td><td>as / DateTime.parse / firstWhere</td></tr>
+<tr><td>PostgrestList</td><td>List&lt;CharacterModel&gt;</td><td>map + toList</td></tr>
+<tr><td>List&lt;CharacterModel&gt;</td><td>List&lt;CharacterEntity&gt;</td><td>covariance (وراثة)</td></tr>
+<tr><td>Exception</td><td>Failure</td><td>FailureMapper.switch</td></tr>
+<tr><td>Future&lt;T&gt;</td><td>Either</td><td>_guard try/catch</td></tr>
+<tr><td>Either</td><td>State</td><td>fold</td></tr>
+<tr><td>AuthStates</td><td>Route</td><td>sealed switch</td></tr>
+</table>
+
+<h2>11) أسئلة وأجوبة (مرجع سريع)</h2>
+<h3>initState vs didChangeDependencies</h3>
+<table>
+<tr><th></th><th>initState</th><th>didChangeDependencies</th></tr>
+<tr><td>عدد المرات</td><td>مرة واحدة</td><td>مرة بعد initState + كل مرة تتغير فيها dependency</td></tr>
+<tr><td>InheritedWidget</td><td>ممنوع</td><td>مسموح</td></tr>
+<tr><td>الاستخدام</td><td>Controllers / FocusNode / أول event</td><td>Theme.of / MediaQuery / GoRouterState / context.locale</td></tr>
+</table>
+<h3>ليه لا نستخدم rethrow وخلاص</h3>
+<p>rethrow في catch فاضي = كود ميت. الـ datasource بيرمي exceptions الأصلية من Supabase، والـ repository بيترجمها. بنرمي exception بنفسنا فقط لما الخطأ يكون من عندنا (مفيش صف users، مفيش session) — والأفضل تعريف exception خاص بيه بدل استخدام AuthException.</p>
+<h3>تكرار توست جوجل</h3>
+<p>الـ initState بيشتغل عند الظهور، والـ BlocListener بيشتغل عند التغيّر فقط. دخول من deep link: الحالة اتغيرت قبل ما الشاشة تظهر → initState بس. تغيّر تاني والشاشة ظاهرة → listener بس. الحل الأنضف: listener واحد على مستوى الجذر داخل MaterialApp.router.builder.</p>
+<h3>RLS مش بتحمي القيم</h3>
+<p>الـ policy بتحدد أي صفوف تقدر تلمسها، مش القيم اللي بتبعتها. فمستخدم معدّل يقدر يبعت xp=9999 وهو بيعمل insert لصفه. الحل: defaults + trigger + منع الكتابة، والـ XP/Coins تتحدّث فقط من دوال SECURITY DEFINER.</p>
+
+<h2>12) مهام مسجلة</h2>
+<ul>
+  <li>[x] توست جوجل في مكان واحد: <code>BlocListener</code> على الجذر داخل <code>MaterialApp.router.builder</code> + <code>ToastificationWrapper</code>.</li>
+  <li>[x] إزالة <code>validator</code> من AppTextField (بقى <code>TextField</code>) وإزالة <code>Form</code> من signin/credential/name.</li>
+  <li>[ ] مراجعة كل القيم الثابتة وتحويلها لـ .w/.h/.sp (مؤجل).</li>
+  <li>[ ] مراجعة كل RLS policies + تجربة E2E قبل الـ deploy.</li>
+  <li>[ ] تخصيص exceptions للـ domain بدل استعارة <code>AuthException</code>.</li>
+  <li>[ ] توحيد CharacterRepositoryImpl على FailureMapper.</li>
+  <li>[ ] SQL migrations + تأمين أعمدة اللعب في users.</li>
+  <li>[ ] استبدال test/widget_test.dart باختبارات حقيقية.</li>
+  <li>[ ] حسم شكل الـ Design Tokens (radius / خطوط).</li>
+</ul>
+
+</body>
+</html>
