@@ -1,3 +1,4 @@
+import 'package:elmohadra/core/errors/app_exceptions.dart';
 import 'package:elmohadra/features/auth/data/datasources/auth_remote_data_source.dart';
 import 'package:elmohadra/features/auth/data/models/user_model.dart';
 import 'package:elmohadra/features/auth/domain/entities/auth_user_result.dart';
@@ -31,12 +32,12 @@ class AuthRemoteDataSourceImpl extends AuthRemoteDataSource {
 
     final user = res.user;
     if (user == null) {
-      throw AuthException('invalid_credentials', code: 'invalid_credentials');
+      throw const InvalidCredentialsException();
     }
 
     final profile = await _fetchProfile(user.id);
     if (profile == null) {
-      throw AuthException('user_not_found', code: 'user_not_found');
+      throw ProfileMissingException(user.id);
     }
     return profile;
   }
@@ -59,7 +60,7 @@ class AuthRemoteDataSourceImpl extends AuthRemoteDataSource {
 
       final user = res.user;
       if (user == null) {
-        throw AuthException('signup_failed', code: 'signup_failed');
+        throw AuthSignUpFailedException();
       }
       userId = user.id;
     }
@@ -67,7 +68,7 @@ class AuthRemoteDataSourceImpl extends AuthRemoteDataSource {
     else {
       final user = supabaseClient.auth.currentUser;
       if (user == null) {
-        throw AuthException('user_not_found', code: 'user_not_found');
+        throw AuthSignUpFailedException();
       }
       userId = user.id;
     }
@@ -75,7 +76,7 @@ class AuthRemoteDataSourceImpl extends AuthRemoteDataSource {
     // When email confirmation is enabled Supabase returns a user without a
     // session, so inserting the profile would fail silently on RLS.
     if (supabaseClient.auth.currentSession == null) {
-      throw AuthException('email_not_confirmed', code: 'email_not_confirmed');
+      throw EmailConfirmationRequiredException();
     }
 
     final res2 = await supabaseClient
@@ -116,7 +117,7 @@ class AuthRemoteDataSourceImpl extends AuthRemoteDataSource {
   Future<UserModel> getUserById(String userId) async {
     final profile = await _fetchProfile(userId);
     if (profile == null) {
-      throw AuthException('user_not_found', code: 'user_not_found');
+      throw ProfileMissingException(userId);
     }
     return profile;
   }

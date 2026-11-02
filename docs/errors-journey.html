@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+<meta charset="utf-8">
+<title>ElMohadra — رحلة الأخطاء والاستثناءات</title>
+<style>
+  @page { size: A4; margin: 18mm 16mm; }
+  body { font-family: "Noto Sans Arabic", "DejaVu Sans", sans-serif; direction: rtl; text-align: right; font-size: 11pt; line-height: 1.85; color: #111; }
+  h1 { font-size: 21pt; color: #0B1F44; border-bottom: 3px solid #FF3B3B; padding-bottom: 6px; }
+  h2 { font-size: 15.5pt; color: #1B3A6B; margin-top: 26px; border-right: 5px solid #FF3B3B; padding-right: 10px; page-break-after: avoid; }
+  h3 { font-size: 12.5pt; color: #0B1F44; margin-top: 18px; page-break-after: avoid; }
+  code, pre { font-family: "DejaVu Sans Mono", monospace; direction: ltr; text-align: left; }
+  code { background: #F1F3F7; padding: 1px 4px; border-radius: 3px; font-size: 9.2pt; }
+  pre { background: #F7F8FA; border: 1px solid #D8DEE9; border-radius: 6px; padding: 10px; font-size: 8.6pt; line-height: 1.5; white-space: pre-wrap; page-break-inside: avoid; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; font-size: 9.4pt; page-break-inside: auto; }
+  th, td { border: 1px solid #C9D2E0; padding: 5px 7px; vertical-align: top; }
+  th { background: #0B1F44; color: #fff; font-size: 9.5pt; }
+  tr:nth-child(even) td { background: #F4F6FA; }
+  .note { background: #FFF6E5; border-right: 5px solid #F0A500; padding: 8px 12px; margin: 12px 0; page-break-inside: avoid; }
+  .warn { background: #FDECEC; border-right: 5px solid #FF3B3B; padding: 8px 12px; margin: 12px 0; page-break-inside: avoid; }
+  .ok { background: #EAF9F0; border-right: 5px solid #2ECC71; padding: 8px 12px; margin: 12px 0; page-break-inside: avoid; }
+  ul, ol { padding-right: 22px; }
+  .toc li { margin: 2px 0; }
+  .flow { background: #0B1F44; color: #F8F6F2; font-family: "DejaVu Sans Mono", monospace; direction: ltr; text-align: left; font-size: 8.2pt; line-height: 1.45; padding: 12px; border-radius: 6px; white-space: pre; }
+</style>
+</head>
+<body>
+
+<h1>المحاضرة — رحلة الأخطاء والاستثناءات</h1>
+<p><b>النطاق:</b> كل ما يتعلق بالخطأ من لحظة حدوثه عند السيرفر لحد ما يظهر للمستخدم كنص عربي، ومكان الخلل في كل مرحلة، والمطلوب عمله في التاسك القادم. الكود المرجعي: بعد commit <code>b5c1d21</code> + التعديلات غير المرفوعة.</p>
+
+<h2>0) الفهرس</h2>
+<ol class="toc">
+  <li>الصورة الكبيرة: 4 مفاهيم مختلفة بنسميهم كلهم "error"</li>
+  <li>خريطة الملفات ومسؤولية كل ملف</li>
+  <li>الرحلة الكاملة من ضغطة الزر لحد التوست</li>
+  <li>كل الأماكن اللي بيتولد فيها الخطأ (المصادر الفعلية)</li>
+  <li>الـ <code>_guard</code> — نقطة التحويل</li>
+  <li>الـ <code>FailureMapper</code> — جدول التحويل</li>
+  <li>شجرة الـ Failures</li>
+  <li>من Failure لـ State (والـ Equatable)</li>
+  <li>من Code لنص عربي (الترجمة)</li>
+  <li>مسارات الواجهة الثلاثة</li>
+  <li>الثقوب الحالية مرتبة بالأولوية</li>
+  <li>التصميم المقترح (بدون تنفيذ)</li>
+  <li>خطة التنفيذ خطوة بخطوة</li>
+  <li>قرارات وقواعد تاخدها معاك</li>
+</ol>
+
+<h2>1) الصورة الكبيرة: 4 حاجات بنسميهم كلهم "error"</h2>
+<p>أغلب اللخبطة بتحصل إن فيه 4 كيانات مختلفة، وكل واحد له مكان ومسؤولية. الخطأ إن أي واحد يعدّي حدود مرحلته.</p>
+
+<table>
+<tr><th>#</th><th>الكيان</th><th>الطبقة</th><th>شكله</th><th>مين المسؤول عنه</th><th>مثال في كودك</th></tr>
+<tr><td>1</td><td><b>Exception</b></td><td>Data</td><td>كلاس بيترمي بـ <code>throw</code></td><td>الـ datasource / SDK</td><td><code>AuthException('invalid_credentials')</code></td></tr>
+<tr><td>2</td><td><b>Failure</b></td><td>Domain</td><td>كلاس بيرجع في <code>Either.Left</code></td><td>الـ repository</td><td><code>AuthFailure(code: 'invalid_credentials')</code></td></tr>
+<tr><td>3</td><td><b>State</b></td><td>Presentation</td><td>كلاس sealed بيتبعت من البلوك</td><td>الـ Bloc</td><td><code>SigninBlocError(failure: ...)</code></td></tr>
+<tr><td>4</td><td><b>Translation Key</b></td><td>Presentation</td><td>String زي <code>errors.auth.invalid_credentials</code></td><td>الـ Mapper + json</td><td><code>"الايميل أو الباسورد غلط"</code></td></tr>
+</table>
+
+<div class="ok">
+<b>القاعدة الذهبية:</b> Exception ميعبرش حدود الـ data. Failure ميعبرش حدود الـ presentation. الـ State مش شايل نص للمستخدم. النص بيتولد في آخر لحظة من ملف JSON.
+</div>
+
+<p>كل واحدة من دول ليها سبب وجود:</p>
+<ul>
+<li><b>Exception</b> موجود لأن SDK بترمي، ومفيش طريقة تانية تتعامل بيها مع مكتبة مش بتاعتك.</li>
+<li><b>Failure</b> موجودة عشان الـ domain ميعرفش Supabase. لو بكرة استبدلنا Supabase بـ REST API، الـ Failures تفضل زي ما هي.</li>
+<li><b>State</b> موجود عشان الواجهة تتعامل مع حالات محدودة معروفة (closed set) بدل boolean متشعبة.</li>
+<li><b>Key</b> موجود عشان اللغة. لو كتبت النص العربي جوه الـ Bloc، مش هتقدر تعمل إنجليزي أبدًا.</li>
+</ul>
+
+<h2>2) خريطة الملفات</h2>
+<table>
+<tr><th>الملف</th><th>مسؤوليته في رحلة الخطأ</th><th>بيتعامل مع</th></tr>
+<tr><td><code>features/auth/data/datasources/auth_remote_data_source_impl.dart</code></td><td>بيضرب Supabase؛ هو المصدر رقم 1 للأخطاء. بيرمي <code>AuthException</code> من SDK أو من كودك.</td><td>Exception</td></tr>
+<tr><td><code>features/characters/data/datasources/character_datasource_impl.dart</code></td><td>بيسحب <code>characters</code> من الداتابيز. مبيرميش حاجة بنفسه — أي خطأ جاي من SDK أو من الـ parsing.</td><td>Exception</td></tr>
+<tr><td><code>core/errors/failure_mapper.dart</code></td><td>الترجمة: Exception → Failure. أهم ملف في الموضوع كله.</td><td>Exception → Failure</td></tr>
+<tr><td><code>core/errors/failures.dart</code></td><td>تعريف عيلة الـ Failure (7 كلاسات).</td><td>Failure</td></tr>
+<tr><td><code>features/auth/data/repositories/auth_repository_impl.dart</code></td><td>بيعمل الحدود: <code>_guard</code> بيمسك أي exception ويرجّع <code>Left(Failure)</code>.</td><td>Exception → Failure</td></tr>
+<tr><td><code>features/characters/data/repositories/character_repository_impl.dart</code></td><td>نسخة قديمة من نفس الفكرة (try/catch يدوي) — لسه مش موحّدة.</td><td>Exception → Failure</td></tr>
+<tr><td><code>core/usecase/base_usecase.dart</code></td><td>بيعرّف إن كل usecase بيرجع <code>Future&lt;Either&lt;Failure, R&gt;&gt;</code> — يعني نوع الإرجاع مفروض على الكل.</td><td>Failure</td></tr>
+<tr><td><code>.../Auth Bloc/states/auth_states.dart</code></td><td><code>AuthError(message)</code> — لاحظ: String بس، مش Failure.</td><td>State</td></tr>
+<tr><td><code>.../SignIn Bloc/states/sign_in_states.dart</code></td><td><code>SigninBlocError(message, failure)</code>.</td><td>State</td></tr>
+<tr><td><code>.../SignUp Bloc/states/sign_up_bloc_states.dart</code></td><td><code>SignUpError(message, failure)</code>.</td><td>State</td></tr>
+<tr><td><code>.../characters/presentation/states/character_states.dart</code></td><td><code>CharacterIError(message, failure)</code>.</td><td>State</td></tr>
+<tr><td><code>core/errors/app_error_mapper.dart</code></td><td>Failure → translation key (title + description).</td><td>Failure → Key</td></tr>
+<tr><td><code>assets/translations/ar.json</code>, <code>en.json</code></td><td>مفاتيح <code>errors.*</code> بالنص النهائي.</td><td>Key → نص</td></tr>
+<tr><td><code>sign_in_screen.dart</code>, <code>sign_up_screen.dart</code>, <code>character_choice_screen.dart</code></td><td>اللي بيعرض فعليًا (toast / retry / ولا حاجة).</td><td>State → UI</td></tr>
+</table>
+
+<h2>3) الرحلة الكاملة</h2>
+<p>السيناريو: المستخدم كتب باسورد غلط وضغط "ادخل الآن".</p>
+
+<div class="flow">
+[1] SignInScreen.onTap
+     setState(validate) -> لو فيه خطأ وقف (مش بيوصل للسيرفر)
+
+[2] context.read&lt;SignInBloc&gt;().add(SignInEvent(params))
+        |
+        v
+[3] SignInBloc: emit(SigninBlocLoading)
+        |
+        v
+[4] SigninWithEmailUsecase.call(params)
+     -> authRepository.signInWithEmail(params)        // domain interface
+        |
+        v
+[5] AuthRepositoryImpl.signInWithEmail
+     = _guard(() => datasource.signInWithEmail(params))
+        |
+        v
+[6] AuthRemoteDataSourceImpl.signInWithEmail
+     supabase.auth.signInWithPassword(...)  --&gt; HTTP 400
+        ^
+        |  throw AuthException('Invalid login credentials',
+        |                        statusCode:'400', code:'invalid_credentials')
+        |
+[7] _guard.catch(e) -> return Left(FailureMapper.map(e))
+     FailureMapper: AuthException() =&gt; AuthFailure(message:..., code:'invalid_credentials')
+        |
+        v
+[8] SignInBloc: res.fold(
+        (l) =&gt; emit(SigninBlocError(message: l.message, failure: l)),
+        (r) =&gt; emit(SigninBlocSuccess(user: r)))
+        |
+        v
+[9] BlocConsumer.listener في SignInScreen
+     AppErrorTitleMapper.toKey(state.failure)  -&gt; 'errors.auth.invalid_credentials'
+     .tr()                                     -&gt; "الايميل أو الباسورد غلط"
+     AppToast.show(...)                        -&gt; toastification
+        |
+        v
+[10] المستخدم شاف الرسالة
+</div>
+
+<div class="note">
+لاحظ إن <b>الـ Bloc مبيعرفش Supabase</b>، والـ <b>Screen ميعرفش Failure</b> (بيسأل mapper)، والـ <b>json مالوش علاقة بالسيرفر</b>. كل طبقة بتترجم لمفهوم الطبقة اللي بعدها بس.
+</div>
+
+<h3>نفس الرحلة لما الخطأ يكون من عندك إنت (مش من السيرفر)</h3>
+<pre>// في الـ datasource
+final user = res.user;
+if (user == null) {
+  throw AuthException('invalid_credentials', code: 'invalid_credentials');
+}
+// العملية "نجحت" (HTTP 200) بس النتيجة فاضية -&gt; مفيش exception من SDK
+// فإنت اللي بترمي، وباقي الرحلة زي ما هي.</pre>
+
+<h2>4) كل الأماكن اللي بيتولد فيها الخطأ</h2>
+<p>دي القائمة الكاملة في الكود الحالي — 8 مصادر. مهم تعرف كل واحد عشان تعرف إيه اللي بيغطيه الـ mapper وإيه اللي بيفلت.</p>
+
+<table>
+<tr><th>#</th><th>المكان</th><th>الشرط</th><th>اللي بيترمي</th><th>يوصل Failure إيه</th></tr>
+<tr><td>1</td><td><code>signInWithEmail</code></td><td><code>res.user == null</code> (بدون throw من SDK)</td><td><code>AuthException(code:'invalid_credentials')</code></td><td>AuthFailure</td></tr>
+<tr><td>2</td><td><code>signInWithEmail</code></td><td>مفيش صف في <code>users</code> لنفس الـ id</td><td><code>AuthException(code:'user_not_found')</code></td><td>AuthFailure</td></tr>
+<tr><td>3</td><td><code>signUpWithEmail</code></td><td><code>res.user == null</code> بعد signUp</td><td><code>AuthException(code:'signup_failed')</code></td><td>AuthFailure <b>بكود مش موجود في الـ mapper</b> → errors.unknown</td></tr>
+<tr><td>4</td><td><code>signUpWithEmail</code></td><td>Google: <code>currentUser == null</code></td><td><code>AuthException(code:'user_not_found')</code></td><td>AuthFailure</td></tr>
+<tr><td>5</td><td><code>signUpWithEmail</code></td><td><code>currentSession == null</code> (تأكيد إيميل مطلوب)</td><td><code>AuthException(code:'email_not_confirmed')</code></td><td>AuthFailure</td></tr>
+<tr><td>6</td><td><code>getUserById</code></td><td>مفيش صف users</td><td><code>AuthException(code:'user_not_found')</code></td><td>AuthFailure</td></tr>
+<tr><td>7</td><td>SDK نفسه</td><td>أي فشل شبكة / صلاحيات / RLS / عمود مش موجود</td><td><code>AuthException</code>, <code>PostgrestException</code>, <code>StorageException</code>, <code>FunctionException</code>, <code>SocketException</code></td><td>حسب الـ mapper (فيه ثقوب — شوف §6)</td></tr>
+<tr><td>8</td><td><code>UserModel.fromJson</code> / <code>CharacterModel.fromJson</code></td><td>عمود راجع <code>null</code> أو نوع مختلف (مثلاً <code>xp</code> راجع double)</td><td><code>TypeError</code> / <code>FormatException</code></td><td>ServerFailure (رسالة الـ cast)</td></tr>
+</table>
+
+<div class="warn">
+<b>المصدر رقم 8 هو أخطر واحد وأكتر واحد بيضيّع وقت.</b> لو عمود في الداتابيز ناقص، الرسالة اللي بتوصل المستخدم "حدث خطأ، حاول مرة أخرى" — وإنت مش عارف السبب. الحل مش إنك تكتب try/catch في كل حتة، الحل إنك تحسّن الـ mapper (شوف §11 نقطة 6).
+</div>
+
+<h2>5) الـ <code>_guard</code> — نقطة التحويل</h2>
+<pre>Future&lt;Either&lt;Failure, T&gt;&gt; _guard&lt;T&gt;(Future&lt;T&gt; Function() call) async {
+  try {
+    return Right(await call());
+  } catch (e) {
+    return Left(FailureMapper.map(e));
+  }
+}
+
+// كل دالة في الريبو سطر واحد:
+@Override
+Future&lt;Either&lt;Failure, UserEntity&gt;&gt; signInWithEmail(SigninParams params) =&gt;
+    _guard(() =&gt; authRemoteDataSource.signInWithEmail(params));</pre>
+
+<h3>ليه generic <code>&lt;T&gt;</code>؟</h3>
+<p>عشان نفس الكود يخدم <code>UserEntity</code> و<code>void</code> و<code>bool</code> و<code>AuthUserResult</code>. من غير generic هتكتب 7 نسخ متطابقة.</p>
+
+<h3>ليه بنمسك <code>Object</code> مش <code>Exception</code>؟</h3>
+<p>لأن <code>catch (e)</code> بيمسك أي حاجة اترمت، حتى لو <code>Error</code> (زي <code>TypeError</code>). ولو كتبت <code>on Exception catch (e)</code> هتفلت الأخطاء اللي بتيجي من الـ casting — وهي بالظبط اللي محتاجين نمسكها.</p>
+
+<h3>ليه مفيش rethrow؟</h3>
+<p>لأن عقد الريبو بيقول: بيرجع <code>Either</code>، ومش بيرمي. لو رميت برّه، الـ Bloc هيقع والـ <code>fold</code> مش هيتنفذ أبدًا.</p>
+
+<h3>الحالة الوحيدة اللي مسموح فيها بـ throw</h3>
+<p>الـ datasource — لأنه بيتكلم مع مكتبة خارجية عقدها throw. ومفيش try/catch فاضي حواليه، لأن ده كود ميت (بيمسك ويرمي تاني نفس الحاجة).</p>
+
+<h2>6) الـ <code>FailureMapper</code> — جدول التحويل</h2>
+<pre>abstract class FailureMapper {
+  static Failure map(Object error) {
+    return switch (error) {
+      AuthException() =&gt; AuthFailure(
+          message: error.toString(),
+          code: error.code ?? 'unknown',
+        ),
+      PostgrestException() =&gt; ServerFailure(message: error.toString()),
+      StorageException() =&gt; ServerFailure(message: error.toString()),
+      SocketException() =&gt; NetworkFailure(message: error.toString()),
+      _ =&gt; ServerFailure(message: error.toString()),
+    };
+  }
+}</pre>
+
+<h3>اللي شغال صح</h3>
+<ul>
+<li><code>switch</code> على النوع بـ object pattern (<code>AuthException()</code>) — بيمسك الـ subclasses كمان، زي <code>AuthApiException</code> و<code>AuthWeakPasswordException</code>، لأنهم <code>extends AuthException</code>.</li>
+<li>الترتيب: الحالات الأخص الأول. <code>_</code> في الآخر كـ fallback مضمون.</li>
+<li>مكان واحد بس — لو عايز تضيف نوع جديد تعدّل سطر واحد.</li>
+</ul>
+
+<h3>اللي ناقص (وهو اللي هنشتغل عليه)</h3>
+<table>
+<tr><th>#</th><th>النقص</th><th>الأثر العملي</th></tr>
+<tr><td>1</td><td><b>مفيش branch لـ <code>FunctionException</code></b></td><td>أي خطأ من Edge Function (زي <code>check-email-exists</code> وهو واقع) بيروح <code>_</code> → ServerFailure → "حدث خطأ". مش كارثة بس مش دقيق.</td></tr>
+<tr><td>2</td><td><b>مفيش branch لـ <code>AuthRetryableFetchException</code></b></td><td>دي اللي بتترمي لما الشبكة تقع أثناء auth. هي subclass من <code>AuthException</code> → بتتحول <b>AuthFailure</b> مع <code>code: null → 'unknown'</code>، بدل ما تتحول NetworkFailure. يعني "الشبكة واقعة" بتظهر "حدث خطأ".</td></tr>
+<tr><td>3</td><td><b>مفيش branch لـ <code>http.ClientException</code></b></td><td>على الموبايل أحيانًا الفشل بيطلع من طبقة http مش من Socket مباشرة. لو ممسكتهاش → ServerFailure.</td></tr>
+<tr><td>4</td><td><b><code>PostgrestException.code</code> بيضيع</b></td><td>الكود فيه معلومات ذهبية: <code>23505</code> = unique violation (إيميل متسجل)، <code>42501</code> = RLS رفض، <code>PGRST116</code> = صف مش موجود. دلوقتي كلهم "حدث خطأ".</td></tr>
+<tr><td>5</td><td><b>بيبلع الـ exception الأصلي</b></td><td>مفيش <code>debugPrint</code> ولا log. لو المستخدم قال "بيظهرلي خطأ"، مفيش أي أثر تقدر تتتبعه.</td></tr>
+<tr><td>6</td><td><b>مفيش تمييز بين <code>TypeError</code> وبين فشل سيرفر</b></td><td>غلطة في الـ schema بتظهر كأنها مشكلة شبكة. صعب جدًا تتشخص.</td></tr>
+</table>
+
+<h2>7) شجرة الـ Failures</h2>
+<pre>Failure (abstract, Equatable)
+├── ServerFailure       message            [مستخدم]
+├── NetworkFailure      message            [مستخدم]
+├── LocalFailure        message            [معرّف وغير مستخدم]
+├── MatchMakingFailure  message            [معرّف وغير مستخدم]
+├── BattleFailure       message            [معرّف وغير مستخدم]
+├── AuthFailure         message + code     [مستخدم]
+└── CacheFailure        message            [معرّف وغير مستخدم]</pre>
+
+<table>
+<tr><th>الكلاس</th><th>مين بيرجّعه دلوقتي</th><th>ملاحظة</th></tr>
+<tr><td><code>AuthFailure</code></td><td>أي <code>AuthException</code></td><td>الوحيد اللي شايل <code>code</code> — وده اللي بيخلي الترجمة ممكنة</td></tr>
+<tr><td><code>ServerFailure</code></td><td>Postgrest / Storage / أي حاجة متعرفش</td><td>مفيش <code>code</code> → الترجمة بتقف عند "حدث خطأ"</td></tr>
+<tr><td><code>NetworkFailure</code></td><td>SocketException فقط</td><td>نادرًا ما بيتفعّل (شوف §6 نقطة 3)</td></tr>
+<tr><td><code>LocalFailure</code> … <code>CacheFailure</code></td><td>ولا حد</td><td>مستقبلية — سيبهم</td></tr>
+</table>
+
+<div class="warn">
+<b>باج حقيقي في <code>failures.dart</code>:</b> <code>Failure.props =&gt; [message]</code>، و<code>AuthFailure</code> <b>مش</b> بتعمل override. يعني:
+<pre>AuthFailure(message: 'x', code: 'user_not_found')
+  == AuthFailure(message: 'x', code: 'email_not_confirmed')   // true ❗</pre>
+السبب: الـ Equatable بتقارن <code>props</code>، والـ <code>code</code> مش موجود فيها. والنتيجة إن البلوك ممكن ميبعتش الحالة الجديدة، أو إن مقارنة حالتين مختلفتين تطلع متساوية. نفس الغلطة اللي كانت في <code>SigninBlocError</code> قبل ما تتصلح.
+</div>
+
+<h2>8) من Failure لـ State</h2>
+<p>الـ <code>fold</code> هو اللي بيقرر: لو <code>Left</code> يبقى error state، لو <code>Right</code> يبقى success.</p>
+
+<pre>res.fold(
+  (l) =&gt; emit(SigninBlocError(message: l.message, failure: l)),
+  (r) =&gt; emit(SigninBlocSuccess(user: r)),
+);</pre>
+
+<table>
+<tr><th>البلوك</th><th>State الخطأ</th><th>شايل إيه</th><th>props</th></tr>
+<tr><td>SignInBloc</td><td><code>SigninBlocError</code></td><td>message + failure</td><td><code>[message, failure]</code> ✅</td></tr>
+<tr><td>SignUpBloc</td><td><code>SignUpError</code></td><td>message + failure</td><td><code>[message, failure]</code> ✅</td></tr>
+<tr><td>CharacterBloc</td><td><code>CharacterIError</code></td><td>message + failure</td><td><code>[message, failure]</code> ✅</td></tr>
+<tr><td>AuthBloc</td><td><code>AuthError</code></td><td><b>message بس</b></td><td><code>[message]</code> ⚠️</td></tr>
+</table>
+
+<h3>ليه <code>AuthError</code> مختلف؟</h3>
+<p>لأنه مش ناتج عن فورم معيّن، هو حالة عامة للتطبيق (sign out فشل مثلًا)، والـ router بيعتمد عليه:
+<code>AuthError() =&gt; AppRoutes.signin</code>. لكنه <b>مش شايل Failure</b> — يعني مستحيل تعرض رسالة دقيقة، ومستحيل تفرّق بين خطأ شبكة وخطأ صلاحيات.</p>
+
+<h2>9) من Code لنص عربي</h2>
+<pre>class AppErrorTitleMapper {
+  static String toKey(Failure failure) =&gt; switch (failure) {
+    NetworkFailure() =&gt; 'errors.network',
+    AuthFailure(:final code) =&gt; switch (code) {
+      _ when code.contains('invalid_credentials') =&gt; 'errors.auth.invalid_credentials',
+      _ when code.contains('email_not_confirmed') =&gt; 'errors.auth.email_not_confirmed',
+      _ when code.contains('user_not_found') =&gt; 'errors.auth.user_not_found',
+      _ =&gt; 'errors.unknown',
+    },
+    _ =&gt; 'errors.unknown',
+  };
+}</pre>
+
+<h3>جدول التغطية الكامل</h3>
+<table>
+<tr><th>اللي حصل فعليًا</th><th>Failure</th><th>code</th><th>title key</th><th>العربي</th></tr>
+<tr><td>باسورد غلط / إيميل غلط</td><td>AuthFailure</td><td><code>invalid_credentials</code></td><td><code>errors.auth.invalid_credentials</code></td><td>الايميل أو الباسورد غلط</td></tr>
+<tr><td>الإيميل لسه متأكدش</td><td>AuthFailure</td><td><code>email_not_confirmed</code></td><td><code>errors.auth.email_not_confirmed</code></td><td>لم يتم تأكيد البريد الإلكتروني</td></tr>
+<tr><td>Auth ناجح بس مفيش صف users</td><td>AuthFailure</td><td><code>user_not_found</code></td><td><code>errors.auth.user_not_found</code></td><td>الحساب غير موجود</td></tr>
+<tr><td>signUp رجع user == null</td><td>AuthFailure</td><td><code>signup_failed</code></td><td><b><code>errors.unknown</code></b></td><td>حدث خطأ، حاول مرة أخرى</td></tr>
+<tr><td>الإيميل متسجل قبل كده (من Supabase)</td><td>AuthFailure</td><td><code>user_already_exists</code></td><td><b><code>errors.unknown</code></b></td><td>حدث خطأ… (مع إن عندنا key جاهز!)</td></tr>
+<tr><td>باسورد ضعيف</td><td>AuthFailure</td><td><code>weak_password</code></td><td><b><code>errors.unknown</code></b></td><td>—</td></tr>
+<tr><td>كتر محاولات</td><td>AuthFailure</td><td><code>over_request_rate_limit</code></td><td><b><code>errors.unknown</code></b></td><td>—</td></tr>
+<tr><td>RLS رفضت / عمود ناقص / صف مش موجود</td><td>ServerFailure</td><td>—</td><td><code>errors.unknown</code></td><td>حدث خطأ…</td></tr>
+<tr><td>الشبكة واقعة (Socket)</td><td>NetworkFailure</td><td>—</td><td><code>errors.network</code></td><td>تحقق من اتصالك بالإنترنت</td></tr>
+<tr><td>الشبكة واقعة أثناء auth</td><td>AuthFailure</td><td><code>null → unknown</code></td><td><code>errors.unknown</code></td><td>❌ المفروض تكون network</td></tr>
+<tr><td>Edge Function واقعة</td><td>ServerFailure</td><td>—</td><td><code>errors.unknown</code></td><td>—</td></tr>
+<tr><td>عمود راجع null (TypeError)</td><td>ServerFailure</td><td>—</td><td><code>errors.unknown</code></td><td>—</td></tr>
+</table>
+
+<div class="note">
+<b>الوصف (description) مش تغطية كاملة:</b> <code>AppErrorDescMapper</code> بيرجّع key واحد بس (<code>invalid_credentials_sub</code> = "تأكد وحاول تاني") و<code>null</code> لكل الباقي. فالتوست بيظهر بعنوان من غير سطر تحتاني في معظم الحالات.
+</div>
+
+<h3>ملاحظة على <code>code.contains(...)</code></h3>
+<p>المقارنة بـ <code>contains</code> مش <code>==</code>. ميزتها إنها بتصمد لو الـ code جاي متبوع بحاجة. عيبها إنها مش دقيقة (<code>'user_not_found'</code> و<code>'user_not_found_v2'</code> نفس الحاجة)، وأي code جديد مش مذكور بيروح <code>errors.unknown</code> حتى لو عنده key جاهز في الـ json. الأنضف: <code>switch</code> على <code>code</code> بـ <code>==</code> أو <code>enum</code>.</p>
+
+<h2>10) مسارات الواجهة الثلاثة</h2>
+
+<h3>أ) SignInScreen — <code>BlocConsumer</code></h3>
+<pre>if (state is SigninBlocError) {
+  AppToast.show(
+    title: AppErrorTitleMapper.toKey(state.failure).tr(),
+    description: AppErrorDescMapper.toKey(state.failure)?.tr(),
+    type: AppToastType.error,
+  );
+}</pre>
+<p>المسار ده سليم: failure → key → tr → toast. ملاحظة صغيرة: <code>AppErrorDescMapper.toKey(...)?.tr()</code> لو رجعت <code>null</code> الناتج <code>null</code> و<code>AppToast</code> بيتعامل معاه (<code>description != null</code>) — تمام.</p>
+
+<h3>ب) SignUpScreen — <code>BlocListener</code></h3>
+<p>نفس الفكرة مع <code>SignUpError</code>. زائد حالة منفصلة (<code>EmailIsExist</code>) بتعرض رسالة الإيميل المتسجل من <b>مفاتيح مباشرة</b> مش من الـ mapper:</p>
+<pre>if (state is EmailIsExist && state.isExist) {
+  AppToast.show(title: 'errors.auth.email_already_exists'.tr(), ...);
+}</pre>
+<p>ده مقبول لأنه مش ناتج عن Failure أصلاً (الـ Edge Function بترجّع bool). بس يبقى في دماغك إن <b>فيه مسارين مختلفين</b> لإظهار رسالة إيميل متسجل: واحد من الـ mapper (لو Supabase رفضت) وواحد مباشر (لو الـ Edge Function قالت موجود).</p>
+
+<h3>ج) CharacterChoiceScreen — رسالة ثابتة</h3>
+<pre>if (state is CharacterIError) {
+  return _buildLoadFailure(context: context, message: "errors.unknown".tr());
+}</pre>
+<p>المشكلة: الـ state شايل <code>failure</code> و<code>message</code>، والواجهة بتتجاهل الاتنين وتكتب نص ثابت. يعني أي خطأ في تحميل الشخصيات — حتى لو شبكة — بيطلع "حدث خطأ".</p>
+
+<h3>د) AuthError — خطأ صامت</h3>
+<p>الـ router بيعمل redirect لـ <code>/signin</code> لما الحالة <code>AuthError</code> — ومفيش أي toast. حاليًا <code>AuthError</code> بيتولد في حالتين: فشل sign out، وفشل فتح Google OAuth. يعني لو Google فشل، المستخدم بيرجع لشاشة الدخول <b>من غير أي تفسير</b>. ده أخطر مسار UX في القائمة.</p>
+
+<h2>11) الثقوب الحالية مرتبة بالأولوية</h2>
+<table>
+<tr><th>#</th><th>الأولوية</th><th>الثقب</th><th>الأثر على المستخدم</th><th>الأثر عليك إنت (تطوير)</th></tr>
+<tr><td>1</td><td>P0</td><td><code>AuthFailure.props</code> ناقص <code>code</code></td><td>—</td><td>states متساوية بالغلط، emit بيتوه، behavior غامض وصعب تتبعه</td></tr>
+<tr><td>2</td><td>P0</td><td>الـ datasource بيستخدم <code>AuthException</code> لأخطاء من عندنا</td><td>—</td><td>خلط طبقات: انت بتستعير كلاس SDK ليعبّر عن حالة ملهاش علاقة بالـ SDK</td></tr>
+<tr><td>3</td><td>P0</td><td><code>AuthError</code> صامت + مش شايل Failure</td><td>فشل Google = رجوع صامت لشاشة الدخول</td><td>مفيش أي وسيلة تعرف سبب الفشل</td></tr>
+<tr><td>4</td><td>P1</td><td><code>signup_failed</code> → errors.unknown</td><td>"حدث خطأ" بدل رسالة مفهومة</td><td>—</td></tr>
+<tr><td>5</td><td>P1</td><td>أكواد Supabase الجاهزة (<code>weak_password</code>, <code>user_already_exists</code>, <code>over_request_rate_limit</code>) مش مترجمة</td><td>رسائل عامة</td><td>wasted keys موجودة في json ومش مستخدمة</td></tr>
+<tr><td>6</td><td>P1</td><td><code>AuthRetryableFetchException</code> بتتحول AuthFailure بدل NetworkFailure</td><td>"حدث خطأ" بدل "اتصل بالنت"</td><td>تتبع الخطأ غلط</td></tr>
+<tr><td>7</td><td>P1</td><td><code>PostgrestException.code</code> بيضيع</td><td>رسائل عامة</td><td>مستحيل تفرّق RLS من unique violation من عمود ناقص</td></tr>
+<tr><td>8</td><td>P2</td><td><code>CharacterRepositoryImpl</code> بتحوّل كل حاجة لـ ServerFailure</td><td>"حدث خطأ" دايمًا</td><td>الكود نفسه فيه تعليق "that is temp"</td></tr>
+<tr><td>9</td><td>P2</td><td>الواجهة بتتجاهل <code>CharacterIError.failure</code></td><td>مفيش retry ذكي ولا رسالة صح</td><td>—</td></tr>
+<tr><td>10</td><td>P2</td><td>مفيش logging للـ exception الأصلي</td><td>—</td><td>أصعب حاجة: مش عارف الخطأ جاي منين</td></tr>
+<tr><td>11</td><td>P3</td><td><code>TypeError</code> من <code>fromJson</code> بيتموّه كخطأ سيرفر</td><td>"حدث خطأ"</td><td>أخطاء الـ schema بتضيّع وقت</td></tr>
+<tr><td>12</td><td>P3</td><td>4 كلاسات Failure مش مستخدمة</td><td>—</td><td>ضجيج في القراءة</td></tr>
+</table>
+
+<h2>12) التصميم المقترح (من غير تنفيذ)</h2>
+
+<h3>12.1 استثناءات خاصة بالـ domain</h3>
+<p>الفكرة: الـ datasource يرمي <b>استثناء بيوصف الحالة</b>، مش يستعير كلاس SDK.</p>
+<pre>lib/core/errors/app_exceptions.dart
+
+class ProfileMissingException implements Exception { final String userId; }
+class EmailConfirmationRequiredException implements Exception {}
+class AuthSignUpFailedException implements Exception {}
+class DataParsingException implements Exception { final String source; }</pre>
+
+<table>
+<tr><th>الحالة الحالية</th><th>تبقى</th><th>ليه</th></tr>
+<tr><td><code>AuthException('invalid_credentials')</code> لما <code>res.user == null</code></td><td><code>InvalidCredentialsException</code></td><td>الحالة دي معناها "البيانات غلط" مش "Supabase قالت كذا"</td></tr>
+<tr><td><code>AuthException('user_not_found')</code> لما مفيش صف</td><td><code>ProfileMissingException(userId)</code></td><td>مفيش صف في <code>users</code> ≠ المستخدم مش موجود في auth</td></tr>
+<tr><td><code>AuthException('signup_failed')</code></td><td><code>AuthSignUpFailedException</code></td><td>عشان تقدر تديها code في الـ mapper</td></tr>
+<tr><td><code>AuthException('email_not_confirmed')</code></td><td><code>EmailConfirmationRequiredException</code></td><td>الحالة دي مش خطأ من السيرفر، دي نتيجة (result) محتاجة تصرف مختلف</td></tr>
+</table>
+
+<div class="note">
+<b>نقطة تصميم مهمة:</b> <code>email_not_confirmed</code> أصلاً مش "خطأ" — هي نتيجة متوقعة. بدل ما ترميها كخطأ وترجع لشاشة الدخول، الأفضل (مستقبلًا) إن الريبو يرجّع Result منفصل ويودّيه على شاشة "فعّل إيميلك". حاليًا أسيبها كـ Failure لحد ما نبني الشاشة.
+</div>
+
+<h3>12.2 الـ mapper بعد التعديل — الشكل المستهدف</h3>
+<pre>static Failure map(Object error) =&gt; switch (error) {
+  NetworkException()      =&gt; NetworkFailure(...),
+  SocketException()       =&gt; NetworkFailure(...),
+  ClientException()       =&gt; NetworkFailure(...),          // http
+  AuthRetryableFetchException() =&gt; NetworkFailure(...),    // قبل AuthException
+
+  ProfileMissingException()            =&gt; AuthFailure(code:'user_not_found'),
+  EmailConfirmationRequiredException() =&gt; AuthFailure(code:'email_not_confirmed'),
+  InvalidCredentialsException()        =&gt; AuthFailure(code:'invalid_credentials'),
+  AuthSignUpFailedException()          =&gt; AuthFailure(code:'signup_failed'),
+
+  FunctionException()     =&gt; ServerFailure(...),
+  PostgrestException()    =&gt; ServerFailure(code: error.code, ...),
+  StorageException()      =&gt; ServerFailure(...),
+  TypeError()             =&gt; DataFailure(...),   // اختياري
+  _                       =&gt; ServerFailure(...),
+};</pre>
+
+<div class="warn">
+<b>ترتيب الحالات مش رفاهية:</b> <code>AuthRetryableFetchException</code> لازم تيجي <b>قبل</b> <code>AuthException</code>، لأنها <code>extends AuthException</code> — نفس الكلام على <code>FunctionsFetchException</code> قبل <code>FunctionException</code>. لو عكست الترتيب، الحالة الأخص مش هتتنفذ أبدًا.
+</div>
+
+<h3>12.3 الـ Failure بعد التعديل</h3>
+<pre>class AuthFailure extends Failure {
+  final String code;
+  const AuthFailure({required super.message, required this.code});
+  @override
+  List&lt;Object?&gt; get props =&gt; [message, code];   // ← السطر الناقص
+}
+
+class ServerFailure extends Failure {
+  final String? code;        // ← جديد: كود Postgres (23505 / 42501 / PGRST116)
+  const ServerFailure({required super.message, this.code});
+  @override
+  List&lt;Object?&gt; get props =&gt; [message, code];
+}</pre>
+
+<h3>12.4 قاعدة القرار: throw ولا return؟</h3>
+<table>
+<tr><th>الحالة</th><th>throw</th><th>return Left</th></tr>
+<tr><td>مكتبة خارجية رمت</td><td>سيبها تطلع</td><td>—</td></tr>
+<tr><td>النتيجة رجعت فاضية/مستحيلة منطقيًا (user == null)</td><td>✅</td><td>—</td></tr>
+<tr><td>التحقق من الداتا (validation)</td><td>❌</td><td>❌ (بيتعمل في الـ presentation)</td></tr>
+<tr><td>حاجة متوقعة ومش خطأ (زي إيميل محتاج تأكيد)</td><td>❌</td><td>الأفضل Result مستقل</td></tr>
+</table>
+
+<h2>13) خطة التنفيذ خطوة بخطوة</h2>
+<p>كل خطوة ملف واحد + تحقق بعدها. الترتيب مرتّب عشان كل خطوة تبقى قابلة للتجربة لوحدها.</p>
+
+<table>
+<tr><th>#</th><th>الملف</th><th>الخطوة</th><th>التحقق</th></tr>
+<tr><td>1</td><td><code>core/errors/failures.dart</code></td><td><code>AuthFailure.props</code> يضيف <code>code</code></td><td><code>flutter analyze</code> + تأكد إن مفيش place بيبني <code>AuthFailure</code> بـ positional (كله named؟)</td></tr>
+<tr><td>2</td><td><code>core/errors/app_exceptions.dart</code> (جديد)</td><td>4 كلاسات exceptions بتاعتنا</td><td>analyze</td></tr>
+<tr><td>3</td><td><code>core/errors/failure_mapper.dart</code></td><td>إضافة الحالات الجديدة <b>قبل</b> <code>AuthException</code></td><td>اكتب حالة اختبار ذهني: كل exception → Failure المتوقع</td></tr>
+<tr><td>4</td><td><code>auth_remote_data_source_impl.dart</code></td><td>استبدال 5 <code>throw AuthException</code> بالاستثناءات الجديدة</td><td>analyze + حاول sign in بباسورد غلط</td></tr>
+<tr><td>5</td><td><code>core/errors/app_error_mapper.dart</code></td><td>إضافة <code>signup_failed</code> و<code>weak_password</code> و<code>user_already_exists</code> و<code>over_request_rate_limit</code>، وتغيير <code>contains</code> لـ <code>switch</code> على <code>==</code></td><td>كل code له key موجود في ar/en</td></tr>
+<tr><td>6</td><td><code>assets/translations/*.json</code></td><td>أي key جديد تضيفه (زي weak password / rate limit)</td><td>تشغيل التطبيق واللغة العربية + الإنجليزية</td></tr>
+<tr><td>7</td><td><code>character_repository_impl.dart</code></td><td>يستخدم <code>_guard</code> + <code>FailureMapper</code> زي الـ auth</td><td>افصل النت وشوف الرسالة (لازم تبقى network)</td></tr>
+<tr><td>8</td><td><code>character_choice_screen.dart</code></td><td>يستخدم <code>AppErrorTitleMapper</code> بدل النص الثابت</td><td>نفس test النت</td></tr>
+<tr><td>9</td><td><code>auth_states.dart</code> + <code>auth_bloc.dart</code></td><td><code>AuthError</code> يشيل <code>Failure</code>؛ والجذر يعرض toast عليه (زي ما عملنا لتوست جوجل)</td><td>اعمل sign out وإنت واصل النت → لازم تشوف رسالة</td></tr>
+<tr><td>10</td><td><code>failure_mapper.dart</code></td><td>إضافة <code>debugPrint</code> للـ exception الأصلي (في <code>kDebugMode</code> بس)</td><td>شوف الـ console</td></tr>
+</table>
+
+<div class="ok">
+<b>ترتيب مقترح للتنفيذ:</b> 1 → 2 → 3 → 4 → 5 → 6، وبعدها 7 → 8. الخطوة 9 لوحدها لأنها بتلمس الـ router والـ UX. الخطوة 10 آخر حاجة.
+</div>
+
+<h2>14) قرارات وقواعد تاخدها معاك</h2>
+
+<table>
+<tr><th>السؤال</th><th>القرار</th><th>السبب</th></tr>
+<tr><td>ليه مش <code>rethrow</code> وخلاص؟</td><td>مفيش <code>rethrow</code> في catch فاضي</td><td>كود ميت: بيمسك ويرمي نفس الحاجة. لو مش هتعمل حاجة، شيل الـ try/catch</td></tr>
+<tr><td>هل أكتب نص للمستخدم في الـ data layer؟</td><td>لأ</td><td>الـ data ميعرفش لغة ولا شاشة. تكتب <code>code</code>، والـ presentation تترجم</td></tr>
+<tr><td><code>code</code> String ولا enum؟</td><td>String حاليًا، enum لاحقًا</td><td>enum بيمنع الأكواد الغلط وقت الـ compile. بس محتاج طبقة تحويل من كود Supabase لـ enum بتاعك</td></tr>
+<tr><td>هل الـ Bloc يستخدم <code>failure.message</code> في الواجهة؟</td><td>لأ، ولا مرة</td><td>الـ message نص تقني (أحيانًا إنجليزي من السيرفر). الواجهة تستخدم الـ key</td></tr>
+<tr><td>هل نحتفظ بـ <code>message</code> في الـ Failure أصلًا؟</td><td>آه، للتشخيص والـ logs</td><td>مش للعرض. وهي كمان بتدخل في <code>props</code> فبتفرّق الحالات</td></tr>
+<tr><td>هل كل failure لازم يبقى لها state؟</td><td>لأ</td><td>الـ state بيمثل حالات الواجهة الممكنة. مثلاً <code>AuthFailure(code:'weak_password')</code> و<code>invalid_credentials</code> نفس الـ state، الرسالة بس مختلفة</td></tr>
+<tr><td>إزاي أعرف إن الشبكة واقعة قبل ما أجرب؟</td><td>متختبرهاش بالتخمين</td><td>افصل الـ wifi واعمل sign in. لو ظهر "حدث خطأ" يبقى الـ <code>AuthRetryableFetchException</code> مش متغطي</td></tr>
+</table>
+
+<h3>أسئلة تشخيص سريعة (تستخدمها وقت أي خطأ)</h3>
+<ol>
+<li>الشاشة عرضت إيه؟ لو "حدث خطأ، حاول مرة أخرى" → يبقى الـ <code>errors.unknown</code>، يعني الـ code مش متغطي في <code>AppErrorTitleMapper</code>.</li>
+<li>الـ state وصل ولا لأ؟ لو مفيش أي toast، يبقى إما البلوك مبعتهاش (props متساوية) أو الـ listener مش موجود.</li>
+<li>الـ Failure نوعه إيه؟ ضيف <code>debugPrint('${failure.runtimeType}')</code> مؤقتًا.</li>
+<li>لو <code>ServerFailure</code> → شوف الـ log: <code>PostgrestException</code> ولا <code>TypeError</code>؟</li>
+<li>لو <code>AuthFailure(code: 'unknown')</code> → الـ SDK رمى <code>AuthException</code> من غير code (غالبًا شبكة أو session).</li>
+</ol>
+
+<h2>15) ملخص في 6 سطور</h2>
+<ol>
+<li>الخطأ بيتولد <b>Exception</b> في الـ data، ويتحول <b>Failure</b> في الـ repository عبر <code>_guard</code> + <code>FailureMapper</code>.</li>
+<li>الـ Bloc بيحوّل الـ Failure لـ <b>State</b> بـ <code>fold</code>، والواجهة بتحوّل الـ State لـ <b>key</b> عبر <code>AppErrorTitleMapper</code> ثم <b>نص</b> من الـ json.</li>
+<li>الكود الحالي سليم في العمود الفقري، وناقص في: <code>AuthFailure.props</code>، واستعارة <code>AuthException</code>، وتغطية أكواد Supabase، وتفصيل <code>PostgrestException</code>.</li>
+<li>أخطر ثقب UX: <code>AuthError</code> صامت — فشل Google بيرجّع المستخدم لشاشة الدخول من غير رسالة.</li>
+<li>أخطر ثقب تطويري: مفيش logging للـ exception الأصلي، فكل خطأ بيبان "حدث خطأ" ومفيش أثر تتتبعه.</li>
+<li>الخطة: failures → exceptions → mapper → datasource → error_mapper → json → character repo → character UI → AuthError → logging.</li>
+</ol>
+
+</body>
+</html>

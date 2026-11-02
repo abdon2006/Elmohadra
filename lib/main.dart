@@ -109,9 +109,6 @@ class _ElmohadraAppState extends State<ElmohadraApp> {
             localizationsDelegates: context.localizationDelegates,
             supportedLocales: context.supportedLocales,
             locale: context.locale,
-            // Single source of truth for auth-driven toasts: the root listener
-            // exists before any screen is built, so it catches state changes
-            // that happen before navigation (e.g. a Google deep link).
             builder: (context, child) => BlocListener<AuthBloc, AuthStates>(
               listener: (context, state) {
                 if (state is AuthNewUser && state.isGoogleSignIn) {

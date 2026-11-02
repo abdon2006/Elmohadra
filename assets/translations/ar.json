@@ -60,15 +60,50 @@
   },
   "errors": {
     "network": "تحقق من اتصالك بالإنترنت",
+    "network_sub": "النت فصل أو الاتصال ضعيف",
+    "timeout": "السيرفر بياخد وقت طويل",
+    "timeout_sub": "حاول تاني بعد لحظة",
+    "server": "في مشكلة في السيرفر",
+    "server_sub": "مش مشكلتك — حاول تاني",
+    "data": "مقدرناش نحمّل البيانات",
+    "data_sub": "حاول تاني، ولو كررت كلّم الدعم",
     "unknown": "حدث خطأ، حاول مرة أخرى",
     "auth": {
       "invalid_credentials": "الايميل أو الباسورد غلط",
       "invalid_credentials_sub": "تأكد وحاول تاني",
       "email_not_confirmed": "لم يتم تأكيد البريد الإلكتروني",
+      "email_not_confirmed_sub": "افتح إيميلك واضغط على رابط التأكيد",
+      "email_not_confirmed_action": "ابعت التأكيد تاني",
       "user_not_found": "الحساب غير موجود",
+      "user_not_found_sub": "الإيميل ده مش متسجل عندنا",
       "email_already_exists": "الايميل ده متسجل قبل كده",
-      "email_already_exists_sub": "جرب ايميل تاني"
+      "email_already_exists_sub": "جرب ايميل تاني",
+      "user_already_exists": "الإيميل ده متسجل قبل كده",
+      "user_already_exists_sub": "جرب ايميل تاني",
+      "signup_failed": "مقدرناش نكمل تسجيلك",
+      "signup_failed_sub": "حاول تاني، ولو كررت جرّب إيميل تاني",
+      "weak_password": "الباسورد ضعيف",
+      "weak_password_sub": "8 حروف على الأقل، فيهم حرف ورقم",
+      "over_request_rate_limit": "محاولات كتير في وقت قصير",
+      "over_request_rate_limit_sub": "استنى دقيقة وحاول تاني",
+      "session_expired": "انتهت صلاحية الجلسة",
+      "session_expired_sub": "سجّل دخول تاني",
+      "signup_disabled": "التسجيل متقفل دلوقتي",
+      "provider_disabled": "الدخول بـ Google متقفل دلوقتي"
+    },
+    "db": {
+      "unique_violation": "البيانات دي موجودة قبل كده",
+      "permission_denied": "مش مسموحلك تعمل ده",
+      "not_found": "مفيش حاجة بالبيانات دي"
     }
+  },
+  "offline": {
+    "banner": "إنت أوفلاين — التغييرات مش هتتحفظ"
+  },
+  "crash": {
+    "title": "حصلت مشكلة غير متوقعة",
+    "body": "جرّب تقفل التطبيق وتفتحه تاني",
+    "restart": "إعادة التشغيل"
   },
   "toast": {
     "signin_success": "أهلاً بيك، يلا نبدأ! 🔥",

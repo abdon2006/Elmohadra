@@ -16,13 +16,12 @@ class SigninBlocLoading extends SignInBlocStates {
 }
 
 class SigninBlocError extends SignInBlocStates {
-  final String message;
   final Failure failure;
 
-  SigninBlocError({required this.message, required this.failure});
+  SigninBlocError({required this.failure});
 
   @override
-  List<Object?> get props => [message, failure];
+  List<Object?> get props => [failure];
 }
 
 class SigninBlocSuccess extends SignInBlocStates {

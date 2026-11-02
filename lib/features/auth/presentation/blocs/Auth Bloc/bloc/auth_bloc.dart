@@ -84,7 +84,7 @@ class AuthBloc extends Bloc<AuthEvents, AuthStates> {
       // closes the browser without finishing.
       final res = await handleSigningWithGoogleUsecase(NoParams());
       res.fold(
-        (failure) => emit(AuthError(message: failure.message)),
+        (failure) => emit(AuthError(failure: failure)),
         (success) => null,
       );
     });
@@ -92,9 +92,7 @@ class AuthBloc extends Bloc<AuthEvents, AuthStates> {
     on<SignOutEvent>((event, emit) async {
       emit(AuthLoading());
       final res = await signoutUsecase(NoParams());
-      res.fold((failure) => emit(AuthError(message: failure.message)), (
-        success,
-      ) {
+      res.fold((failure) => emit(AuthError(failure: failure)), (success) {
         emit(AuthUnAuthenticated());
       });
     });

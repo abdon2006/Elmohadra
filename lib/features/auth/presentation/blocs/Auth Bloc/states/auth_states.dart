@@ -1,3 +1,4 @@
+import 'package:elmohadra/core/errors/failures.dart';
 import 'package:elmohadra/features/auth/domain/entities/auth_user_result.dart';
 import 'package:elmohadra/features/auth/domain/entities/user_entity.dart';
 import 'package:equatable/equatable.dart';
@@ -15,12 +16,12 @@ class AuthLoading extends AuthStates {
 }
 
 class AuthError extends AuthStates {
-  final String message;
+  final Failure failure;
 
-  AuthError({required this.message});
+  AuthError({required this.failure});
 
   @override
-  List<Object?> get props => [message];
+  List<Object?> get props => [failure];
 }
 
 class AuthAuthenticated extends AuthStates {

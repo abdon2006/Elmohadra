@@ -15,13 +15,12 @@ class SignUpLoading extends SignUpStates {
 }
 
 class SignUpError extends SignUpStates {
-  final String message;
   final Failure failure;
 
-  SignUpError({required this.message, required this.failure});
+  SignUpError({required this.failure});
 
   @override
-  List<Object?> get props => [message, failure];
+  List<Object?> get props => [failure];
 }
 
 class SignUpSuccess extends SignUpStates {

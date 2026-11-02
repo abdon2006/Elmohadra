@@ -15,13 +15,12 @@ class CharacterLoading extends CharacterStates {
 }
 
 class CharacterIError extends CharacterStates {
-  final String message;
   final Failure failure;
 
-  CharacterIError({required this.message, required this.failure});
+  CharacterIError({required this.failure});
 
   @override
-  List<Object?> get props => [message, failure];
+  List<Object?> get props => [failure];
 }
 
 class GetCharactersSuccess extends CharacterStates {

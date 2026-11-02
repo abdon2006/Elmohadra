@@ -60,15 +60,50 @@
   },
   "errors": {
     "network": "Connection issue, check your internet",
+    "network_sub": "You're offline or the connection is weak",
+    "timeout": "The server is taking too long",
+    "timeout_sub": "Try again in a moment",
+    "server": "Server problem",
+    "server_sub": "Not your fault — try again",
+    "data": "Couldn't load the data",
+    "data_sub": "Try again, contact support if it persists",
     "unknown": "Something went wrong, try again",
     "auth": {
       "invalid_credentials": "Wrong email or password",
       "invalid_credentials_sub": "Double-check and try again",
-      "email_not_confirmed": "Email needs confirmation, check your inbox",
+      "email_not_confirmed": "Email needs confirmation",
+      "email_not_confirmed_sub": "Open your inbox and tap the confirmation link",
+      "email_not_confirmed_action": "Resend confirmation",
       "user_not_found": "This user doesn't exist",
+      "user_not_found_sub": "This email isn't registered with us",
       "email_already_exists": "This email is already registered",
-      "email_already_exists_sub": "Try a different email"
+      "email_already_exists_sub": "Try a different email",
+      "user_already_exists": "This email is already registered",
+      "user_already_exists_sub": "Try a different email",
+      "signup_failed": "We couldn't finish your sign up",
+      "signup_failed_sub": "Try again, or use a different email",
+      "weak_password": "Weak password",
+      "weak_password_sub": "At least 8 characters with a letter and a number",
+      "over_request_rate_limit": "Too many attempts",
+      "over_request_rate_limit_sub": "Wait a minute and try again",
+      "session_expired": "Session expired",
+      "session_expired_sub": "Please sign in again",
+      "signup_disabled": "Sign up is disabled",
+      "provider_disabled": "Google sign in is disabled"
+    },
+    "db": {
+      "unique_violation": "This record already exists",
+      "permission_denied": "You're not allowed to do this",
+      "not_found": "Nothing found"
     }
+  },
+  "offline": {
+    "banner": "You're offline — changes won't be saved"
+  },
+  "crash": {
+    "title": "Something unexpected happened",
+    "body": "Try closing and reopening the app",
+    "restart": "Restart"
   },
   "toast": {
     "signin_success": "Welcome back, let's go! 🔥",

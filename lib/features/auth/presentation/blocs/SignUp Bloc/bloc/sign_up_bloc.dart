@@ -17,7 +17,7 @@ class SignUpBloc extends Bloc<SignUpBlocEvents, SignUpStates> {
     on<SignUpEvent>((event, emit) async {
       emit(SignUpLoading());
       final res = await signupWithEmailUsecase(event.params);
-      res.fold((l) => emit(SignUpError(message: l.message, failure: l)), (r) {
+      res.fold((l) => emit(SignUpError(failure: l)), (r) {
         emit(SignUpSuccess(user: r));
       });
     });
@@ -25,7 +25,7 @@ class SignUpBloc extends Bloc<SignUpBlocEvents, SignUpStates> {
       emit(SignUpLoading());
       final res = await checkEmailIsExistUsecase(event.email);
       res.fold(
-        (l) => emit(SignUpError(message: l.message, failure: l)),
+        (l) => emit(SignUpError(failure: l)),
         (r) => emit(EmailIsExist(isExist: r)),
       );
     });
