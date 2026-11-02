@@ -27,7 +27,7 @@ class AuthBloc extends Bloc<AuthEvents, AuthStates> {
       emit(AuthLoading());
 
       final res = await getCurrentUserUsecase(NoParams());
-      res.fold((failure) => emit(AuthUnAuthenticated()), (success) {
+      res.fold((failure) => emit(AuthError(failure: failure)), (success) {
         if (success.existingUser != null) {
           emit(AuthAuthenticated(user: success.existingUser!));
         } else if (success.newUserId != null) {
@@ -56,7 +56,7 @@ class AuthBloc extends Bloc<AuthEvents, AuthStates> {
       }
 
       final res = await getCurrentUserUsecase(NoParams());
-      res.fold((failure) => emit(AuthUnAuthenticated()), (success) {
+      res.fold((failure) => emit(AuthError(failure: failure)), (success) {
         if (success.existingUser != null) {
           emit(
             AuthAuthenticated(

@@ -89,7 +89,9 @@
       "session_expired": "Session expired",
       "session_expired_sub": "Please sign in again",
       "signup_disabled": "Sign up is disabled",
-      "provider_disabled": "Google sign in is disabled"
+      "provider_disabled": "Google sign in is disabled",
+      "oauth_failed": "We couldn't finish signing you in with Google",
+      "oauth_failed_sub": "Try again, or sign in with email and password"
     },
     "db": {
       "unique_violation": "This record already exists",

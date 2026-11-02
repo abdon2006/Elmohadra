@@ -4,6 +4,7 @@ import 'package:app_links/app_links.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:elmohadra/core/constants/app_bloc_observer.dart';
 import 'package:elmohadra/core/di/injection.dart';
+import 'package:elmohadra/core/errors/app_error_mapper.dart';
 import 'package:elmohadra/core/localization/locale_cubit.dart';
 import 'package:elmohadra/core/routing/app_router.dart';
 import 'package:elmohadra/core/routing/auth_notifier.dart';
@@ -117,6 +118,14 @@ class _ElmohadraAppState extends State<ElmohadraApp> {
                     title: 'toast.google_welcome'.tr(),
                     description: 'toast.google_welcome_sub'.tr(),
                     type: AppToastType.success,
+                  );
+                }
+                if (state is AuthError) {
+                  AppToast.show(
+                    context: context,
+                    title: AppErrorTitleMapper.toKey(state.failure).tr(),
+                    type: AppToastType.error,
+                    description: AppErrorDescMapper.toKey(state.failure)?.tr(),
                   );
                 }
               },

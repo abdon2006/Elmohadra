@@ -1,4 +1,5 @@
 import 'package:dartz/dartz.dart';
+import 'package:elmohadra/core/errors/failure_mapper.dart';
 import 'package:elmohadra/core/errors/failures.dart';
 import 'package:elmohadra/features/characters/data/datasources/character_datasource.dart';
 import 'package:elmohadra/features/characters/domain/entities/character_entity.dart';
@@ -11,14 +12,15 @@ class CharacterRepositoryImpl extends CharacterRepository {
 
   CharacterRepositoryImpl({required this.characterDatasource});
 
-  @override
-  Future<Either<Failure, List<CharacterEntity>>> getCharacters() async {
+  Future<Either<Failure, T>> _guard<T>(Future<T> Function() call) async {
     try {
-      final res = await characterDatasource.getCharacters();
-      return Right(res);
+      return Right(await call());
     } catch (e) {
-      return Left(ServerFailure(message: e.toString()));
-      // that is temp w will make a switch on the code of the failure to handle the message provided
+      return Left(FailureMapper.map(e));
     }
   }
+
+  @override
+  Future<Either<Failure, List<CharacterEntity>>> getCharacters() =>
+      _guard(() => characterDatasource.getCharacters());
 }

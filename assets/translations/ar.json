@@ -61,8 +61,8 @@
   "errors": {
     "network": "تحقق من اتصالك بالإنترنت",
     "network_sub": "النت فصل أو الاتصال ضعيف",
-    "timeout": "السيرفر بياخد وقت طويل",
-    "timeout_sub": "حاول تاني بعد لحظة",
+    "timeout": "السيرفر بعافية شوية معلش",
+    "timeout_sub": "حاول تاني كمان خمسة",
     "server": "في مشكلة في السيرفر",
     "server_sub": "مش مشكلتك — حاول تاني",
     "data": "مقدرناش نحمّل البيانات",
@@ -88,8 +88,10 @@
       "over_request_rate_limit_sub": "استنى دقيقة وحاول تاني",
       "session_expired": "انتهت صلاحية الجلسة",
       "session_expired_sub": "سجّل دخول تاني",
-      "signup_disabled": "التسجيل متقفل دلوقتي",
-      "provider_disabled": "الدخول بـ Google متقفل دلوقتي"
+      "signup_disabled": "التسجيل مقفول دلوقتي",
+      "provider_disabled": "الدخول بـ Google مقفول دلوقتي",
+      "oauth_failed": "مقدرناش نكمل الدخول بـ Google",
+      "oauth_failed_sub": "حاول تاني، ولو كررت استخدم الإيميل والباسورد"
     },
     "db": {
       "unique_violation": "البيانات دي موجودة قبل كده",

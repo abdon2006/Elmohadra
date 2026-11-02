@@ -12,7 +12,7 @@ class ServerFailure extends Failure {
   const ServerFailure({required super.message, this.code});
 
   @override
-  List<Object?> get props => [message];
+  List<Object?> get props => [message, code];
 }
 
 class NetworkFailure extends Failure {
@@ -54,6 +54,21 @@ class AuthFailure extends Failure {
 
 class CacheFailure extends Failure {
   const CacheFailure({required super.message});
+
+  @override
+  List<Object?> get props => [message];
+}
+
+class TimeoutFailure extends Failure {
+  const TimeoutFailure({required super.message});
+
+  @override
+  List<Object?> get props => [message];
+}
+
+/// error in parsing jsons
+class DataFailure extends Failure {
+  const DataFailure({required super.message});
 
   @override
   List<Object?> get props => [message];
