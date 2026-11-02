@@ -7,79 +7,113 @@ import 'package:http/http.dart' as http;
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 abstract class FailureMapper {
-  static Failure map(Object error) {
+  static Failure map(Object error, StackTrace s) {
     return switch (error) {
       // ============= our domain exceptions =============
       InvalidCredentialsException() => AuthFailure(
         message: error.toString(),
+        stackTrace: s,
         code: 'invalid_credentials',
       ),
       ProfileMissingException() => AuthFailure(
         message: error.toString(),
+        stackTrace: s,
         code: 'user_not_found',
       ),
       AuthSignUpFailedException() => AuthFailure(
         message: error.toString(),
+        stackTrace: s,
         code: 'signup_failed',
       ),
       EmailConfirmationRequiredException() => AuthFailure(
         message: error.toString(),
+        stackTrace: s,
         code: 'email_not_confirmed',
       ),
       // ============= Sub Classes Before Auth Exceptions  =============
-      AuthRetryableFetchException() => NetworkFailure(message: error.message),
+      AuthRetryableFetchException() => NetworkFailure(
+        message: error.message,
+        stackTrace: s,
+      ),
       AuthWeakPasswordException() => AuthFailure(
         message: error.toString(),
+        stackTrace: s,
         code: 'weak_password',
       ),
       AuthSessionMissingException() => AuthFailure(
         message: error.toString(),
+        stackTrace: s,
         code: 'session_expired',
       ),
       AuthInvalidJwtException() => AuthFailure(
         message: error.toString(),
+        stackTrace: s,
         code: 'session_expired',
       ),
       AuthPKCEGrantCodeExchangeError() => AuthFailure(
         message: error.toString(),
+        stackTrace: s,
         code: 'oauth_failed',
       ),
       AuthUnknownException() => AuthFailure(
         message: error.toString(),
+        stackTrace: s,
         code: _authCode(error.code),
       ),
       AuthException() => AuthFailure(
         message: error.toString(),
-        code: error.code ?? 'unknown',
+        code: _authCode(error.code),
+        stackTrace: s,
       ),
 
       // ============= Postgrest - Storage - Functions =============
       PostgrestException() => ServerFailure(
         message: error.toString(),
         code: _dbCode(error.code),
+        stackTrace: s,
       ),
       StorageException() => ServerFailure(
         message: error.toString(),
         code: _statusCode(error.statusCode),
+        stackTrace: s,
       ),
-      FunctionsFetchException() => NetworkFailure(message: error.toString()),
-      FunctionsRelayException() => ServerFailure(message: error.toString()),
+      FunctionsFetchException() => NetworkFailure(
+        message: error.toString(),
+        stackTrace: s,
+      ),
+      FunctionsRelayException() => ServerFailure(
+        message: error.toString(),
+        stackTrace: s,
+      ),
       FunctionsHttpException() => ServerFailure(
         message: error.toString(),
         code: _httpCode(error.status),
+        stackTrace: s,
       ),
       FunctionException() => ServerFailure(
         message: error.toString(),
         code: _httpCode(error.status),
+        stackTrace: s,
       ),
       // ============= Dart - HTTP =============
-
-      SocketException() => NetworkFailure(message: error.toString()),
-      http.ClientException() => NetworkFailure(message: error.toString()),
-      TimeoutException() => TimeoutFailure(message: error.toString()),
-      FormatException() => DataFailure(message: error.toString()),
-      TypeError() => DataFailure(message: error.toString()),
-      _ => ServerFailure(message: error.toString()),
+      SocketException() => NetworkFailure(
+        message: error.toString(),
+        stackTrace: s,
+      ),
+      http.ClientException() => NetworkFailure(
+        message: error.toString(),
+        stackTrace: s,
+      ),
+      TimeoutException() => TimeoutFailure(
+        message: error.toString(),
+        stackTrace: s,
+      ),
+      FormatException() => DataFailure(
+        message: error.toString(),
+        stackTrace: s,
+      ),
+      TypeError() => DataFailure(message: error.toString(), stackTrace: s),
+      _ => ServerFailure(message: error.toString(), stackTrace: s),
     };
   }
 

@@ -54,15 +54,17 @@ void main() {
   const dbCodes = ['unique_violation', 'permission_denied', 'not_found'];
 
   final failures = <Failure>[
-    const NetworkFailure(message: ''),
-    const TimeoutFailure(message: ''),
-    const DataFailure(message: ''),
-    const LocalFailure(message: ''),
-    const CacheFailure(message: ''),
-    const ServerFailure(message: ''),
-    for (final code in dbCodes) ServerFailure(message: '', code: code),
-    ServerFailure(message: '', code: 'timeout'),
-    for (final code in authCodes) AuthFailure(message: '', code: code),
+    const NetworkFailure(message: '', stackTrace: StackTrace.empty),
+    const TimeoutFailure(message: '', stackTrace: StackTrace.empty),
+    const DataFailure(message: '', stackTrace: StackTrace.empty),
+    const LocalFailure(message: '', stackTrace: StackTrace.empty),
+    const CacheFailure(message: '', stackTrace: StackTrace.empty),
+    const ServerFailure(message: '', stackTrace: StackTrace.empty),
+    for (final code in dbCodes)
+      ServerFailure(message: '', code: code, stackTrace: StackTrace.empty),
+    ServerFailure(message: '', code: 'timeout', stackTrace: StackTrace.empty),
+    for (final code in authCodes)
+      AuthFailure(message: '', code: code, stackTrace: StackTrace.empty),
   ];
 
   test('every key the mappers return exists in ar and en', () {

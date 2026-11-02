@@ -1,6 +1,6 @@
 import 'package:dartz/dartz.dart';
-import 'package:elmohadra/core/errors/failure_mapper.dart';
 import 'package:elmohadra/core/errors/failures.dart';
+import 'package:elmohadra/core/errors/repository_guard.dart';
 import 'package:elmohadra/features/auth/data/datasources/auth_remote_data_source.dart';
 import 'package:elmohadra/features/auth/domain/entities/auth_user_result.dart';
 import 'package:elmohadra/features/auth/domain/entities/user_entity.dart';
@@ -15,39 +15,31 @@ class AuthRepositoryImpl extends AuthRepository {
 
   AuthRepositoryImpl({required this.authRemoteDataSource});
 
-  Future<Either<Failure, T>> _guard<T>(Future<T> Function() call) async {
-    try {
-      return Right(await call());
-    } catch (e) {
-      return Left(FailureMapper.map(e));
-    }
-  }
-
   @override
   Future<Either<Failure, void>> handleSigningWithGoogle() =>
-      _guard(() => authRemoteDataSource.handleSigningWithGoogle());
+      guard(() => authRemoteDataSource.handleSigningWithGoogle());
 
   @override
   Future<Either<Failure, UserEntity>> signInWithEmail(SigninParams params) =>
-      _guard(() => authRemoteDataSource.signInWithEmail(params));
+      guard(() => authRemoteDataSource.signInWithEmail(params));
 
   @override
   Future<Either<Failure, void>> signOut() =>
-      _guard(() => authRemoteDataSource.signOut());
+      guard(() => authRemoteDataSource.signOut());
 
   @override
   Future<Either<Failure, UserEntity>> signUpWithEmail(SignupParams params) =>
-      _guard(() => authRemoteDataSource.signUpWithEmail(params));
+      guard(() => authRemoteDataSource.signUpWithEmail(params));
 
   @override
   Future<Either<Failure, UserEntity>> getUserById(String userId) =>
-      _guard(() => authRemoteDataSource.getUserById(userId));
+      guard(() => authRemoteDataSource.getUserById(userId));
 
   @override
   Future<Either<Failure, AuthUserResult>> getCurrentUser() =>
-      _guard(() => authRemoteDataSource.getCurrentUser());
+      guard(() => authRemoteDataSource.getCurrentUser());
 
   @override
   Future<Either<Failure, bool>> checkEmailIsExist(String email) =>
-      _guard(() => authRemoteDataSource.checkEmailIsExist(email));
+      guard(() => authRemoteDataSource.checkEmailIsExist(email));
 }

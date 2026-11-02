@@ -29,7 +29,6 @@ class AppErrorTitleMapper {
         'timeout' => 'errors.timeout',
         _ => 'errors.unknown',
       },
-      _ => 'errors.unknown',
     };
   }
 }
@@ -59,7 +58,6 @@ class AppErrorDescMapper {
         'timeout' => 'errors.timeout_sub',
         _ => null,
       },
-      _ => null,
     };
   }
 }
