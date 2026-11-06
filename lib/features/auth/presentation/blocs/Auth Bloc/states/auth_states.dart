@@ -48,3 +48,18 @@ class AuthUnAuthenticated extends AuthStates {
   @override
   List<Object?> get props => [];
 }
+
+class ResetPasswordLinkSent extends AuthStates {
+  @override
+  List<Object?> get props => [];
+}
+
+class ResetPasswordLinkReceived extends AuthStates {
+  @override
+  List<Object?> get props => [];
+}
+
+class PasswordUpdated extends AuthStates {
+  @override
+  List<Object?> get props => [];
+}

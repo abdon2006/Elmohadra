@@ -145,4 +145,14 @@ class AuthRemoteDataSourceImpl extends AuthRemoteDataSource {
     );
     return res.data['exists'] as bool;
   }
+
+  @override
+  Future<void> sendResetPasswordLink(String email) async => await supabaseClient
+      .auth
+      .resetPasswordForEmail(email, redirectTo: 'elmohadra://reset-password');
+
+  @override
+  Future<void> resetPassword(String newPassword) async {
+    await supabaseClient.auth.updateUser(UserAttributes(password: newPassword));
+  }
 }

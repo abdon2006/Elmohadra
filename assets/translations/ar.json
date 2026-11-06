@@ -6,11 +6,17 @@
   "email_label": "الايميل",
   "password_hint": "دخل الباسوورد اللي سجلت بيه",
   "password_label": "الباسوورد",
+  "new_password_label": "الباسوورد",
+  "new_password_hint": "اعمل باسوورد جديدة وخليك فاكرها",
+  "new_password_confirm_label": "الباسوورد تاني",
+  "new_password_confirm_hint": "كمان مرة عشان خاطري",
   "forgot_password": "نسيت كلمة المرور؟",
   "enter_now": "ادخل دلوقتي",
   "sign_in_google": "الدخول عن طريق Google",
   "dont_have_account": "معندكش حساب؟ ",
   "create_one": "انشئ حساب",
+  "send_reset": "ابعت اللينك",
+  "save_password": "احفظ الباسورد",
   "bottom_nav": {
     "home": "الرئيسية",
     "subjects": "المواد",
@@ -18,6 +24,8 @@
     "profile": "الشخصية"
   },
   "signup": {
+    "reset_pass_succeess_link": "رابط اعادة تعيين الباسوورد اتبعت",
+    "reset_pass_succeess_link_sub": "شوف الايميل بتاعك كده",
     "header_title": "انشئ حسابك",
     "final_title": "جاهز تبدأ؟",
     "next": "التالي",
@@ -119,7 +127,9 @@
     "signup_welcome": "أهلاً بيك يا بطل نورت المحاضرة",
     "signup_welcome_sub": "استكشف المواد وابدأ رحلتك",
     "google_welcome": "مرحباً بيك يا بطل",
-    "google_welcome_sub": "كمّل تسجيلك عشان نوصلك للمعركة"
+    "google_welcome_sub": "كمّل تسجيلك عشان نوصلك للمعركة",
+    "password_updated": "تم تغيير الباسورد ✓",
+    "password_updated_sub": "ادخل بالباسورد الجديدة في المرة الجاية"
   },
   "validation": {
     "required": "هذا الحقل مطلوب",
@@ -130,7 +140,8 @@
     "nickname_max": "اسم المستخدم لا يزيد عن 20 حرف",
     "nickname_no_spaces": "اسم المستخدم لا يحتوي على مسافات",
     "name_min": "الاسم لا يقل عن 3 أحرف",
-    "university_min": "اسم الكلية لا يقل عن 3 أحرف"
+    "university_min": "اسم الكلية لا يقل عن 3 أحرف",
+    "password_mismatch": "الباسوردين مش متطابقين"
   },
   "retry": "حاول تاني",
   "characters": {

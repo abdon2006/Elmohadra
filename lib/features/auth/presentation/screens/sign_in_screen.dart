@@ -152,9 +152,7 @@ class _SignInScreenState extends State<SignInScreen> {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     TextButton(
-                      onPressed: () {
-                        // TODO: Forgot Password Screen
-                      },
+                      onPressed: () => context.push(AppRoutes.resetPass),
                       child: Text(
                         "forgot_password".tr(),
                         style: AppTypography.bodySmall(context).copyWith(

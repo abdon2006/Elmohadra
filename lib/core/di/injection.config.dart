@@ -30,6 +30,10 @@ import '../../features/auth/domain/usecases/get_user_by_id_usecase.dart'
     as _i15;
 import '../../features/auth/domain/usecases/handle_signing_with_google_usecase.dart'
     as _i367;
+import '../../features/auth/domain/usecases/reset_password_usecase.dart'
+    as _i474;
+import '../../features/auth/domain/usecases/send_reset_password_link_usecase.dart'
+    as _i867;
 import '../../features/auth/domain/usecases/signin_with_email_usecase.dart'
     as _i240;
 import '../../features/auth/domain/usecases/signout_usecase.dart' as _i612;
@@ -127,6 +131,16 @@ extension GetItInjectableX on _i174.GetIt {
         authRepository: gh<_i787.AuthRepository>(),
       ),
     );
+    gh.factory<_i474.ResetPasswordUsecase>(
+      () => _i474.ResetPasswordUsecase(
+        authRepository: gh<_i787.AuthRepository>(),
+      ),
+    );
+    gh.factory<_i867.SendResetPasswordLinkUsecase>(
+      () => _i867.SendResetPasswordLinkUsecase(
+        authRepository: gh<_i787.AuthRepository>(),
+      ),
+    );
     gh.factory<_i240.SigninWithEmailUsecase>(
       () => _i240.SigninWithEmailUsecase(
         authRepository: gh<_i787.AuthRepository>(),
@@ -140,17 +154,19 @@ extension GetItInjectableX on _i174.GetIt {
         authRepository: gh<_i787.AuthRepository>(),
       ),
     );
+    gh.factory<_i519.SignInBloc>(
+      () => _i519.SignInBloc(
+        signinWithEmailUsecase: gh<_i240.SigninWithEmailUsecase>(),
+      ),
+    );
     gh.lazySingleton<_i833.AuthBloc>(
       () => _i833.AuthBloc(
         getCurrentUserUsecase: gh<_i17.GetCurrentUserUsecase>(),
         handleSigningWithGoogleUsecase:
             gh<_i367.HandleSigningWithGoogleUsecase>(),
         signoutUsecase: gh<_i612.SignoutUsecase>(),
-      ),
-    );
-    gh.factory<_i519.SignInBloc>(
-      () => _i519.SignInBloc(
-        signinWithEmailUsecase: gh<_i240.SigninWithEmailUsecase>(),
+        sendResetPasswordLinkUsecase: gh<_i867.SendResetPasswordLinkUsecase>(),
+        resetPasswordUsecase: gh<_i474.ResetPasswordUsecase>(),
       ),
     );
     gh.factory<_i128.SignUpBloc>(

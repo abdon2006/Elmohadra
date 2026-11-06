@@ -65,22 +65,35 @@ class _ElmohadraAppState extends State<ElmohadraApp> {
   late final AuthNotifier _authNotifier;
   late final GoRouter _router;
   late final StreamSubscription<Uri> _appLinksSubscription;
+  late final StreamSubscription<AuthState> _authStateSubscription;
 
   @override
   void initState() {
     super.initState();
-
     // Created once so a rebuild never recreates the router (which would drop
     // the navigation stack and leak stream listeners).
     _authNotifier = AuthNotifier(getIt<AuthBloc>());
     _router = appRouter(_authNotifier);
 
     context.read<AuthBloc>().add(CheckAuthStatusEvent());
-
     _appLinksSubscription = AppLinks().uriLinkStream.listen((uri) {
       if (!mounted) return;
-      context.read<AuthBloc>().add(DeepLinkReceivedEvent());
+      if (uri.scheme == 'elmohadra' && uri.host == 'login-callback') {
+        context.read<AuthBloc>().add(DeepLinkReceivedEvent());
+      }
     });
+
+    // The SDK exchanges the recovery link for a session in the background, and
+    // only then reports `passwordRecovery`. Navigating on the raw link would open
+    // the screen even when that exchange failed (expired link, or a link opened
+    // on a device that holds another account's session).
+    _authStateSubscription = Supabase.instance.client.auth.onAuthStateChange
+        .listen((data) {
+          if (!mounted) return;
+          if (data.event == AuthChangeEvent.passwordRecovery) {
+            context.read<AuthBloc>().add(PasswordResetLinkReceivedEvent());
+          }
+        });
   }
 
   @override
@@ -88,6 +101,7 @@ class _ElmohadraAppState extends State<ElmohadraApp> {
     _appLinksSubscription.cancel();
     _authNotifier.dispose();
     _router.dispose();
+    _authStateSubscription.cancel();
     super.dispose();
   }
 
@@ -126,6 +140,22 @@ class _ElmohadraAppState extends State<ElmohadraApp> {
                     title: AppErrorTitleMapper.toKey(state.failure).tr(),
                     type: AppToastType.error,
                     description: AppErrorDescMapper.toKey(state.failure)?.tr(),
+                  );
+                }
+                if (state is ResetPasswordLinkSent) {
+                  AppToast.show(
+                    context: context,
+                    title: 'signup.reset_pass_succeess_link'.tr(),
+                    description: 'signup.reset_pass_succeess_link_sub'.tr(),
+                    type: AppToastType.success,
+                  );
+                }
+                if (state is PasswordUpdated) {
+                  AppToast.show(
+                    context: context,
+                    title: 'toast.password_updated'.tr(),
+                    description: 'toast.password_updated_sub'.tr(),
+                    type: AppToastType.success,
                   );
                 }
               },

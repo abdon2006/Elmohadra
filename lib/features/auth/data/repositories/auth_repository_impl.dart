@@ -42,4 +42,12 @@ class AuthRepositoryImpl extends AuthRepository {
   @override
   Future<Either<Failure, bool>> checkEmailIsExist(String email) =>
       guard(() => authRemoteDataSource.checkEmailIsExist(email));
+
+  @override
+  Future<Either<Failure, void>> sendResetPasswordLink(String email) =>
+      guard(() => authRemoteDataSource.sendResetPasswordLink(email));
+
+  @override
+  Future<Either<Failure, void>> resetPassword(String newPassword) async =>
+      guard(() => authRemoteDataSource.resetPassword(newPassword));
 }
