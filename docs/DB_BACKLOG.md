@@ -11,10 +11,10 @@ Decisions that are made but not built yet.
 - Dart side: one usecase + one datasource method that invokes the function.
   Nothing else.
 
-## Still open in the schema
+## battles.status — decide in Phase 6
 
-- `characters.key` is not unique, and `users.avatar_key` is not a FK to it.
-- `characters` carries two identical read policies.
-- `battles.status` defaults to 'active' while the design uses
-  in_progress / completed / expired.
-- No indexes on any foreign key column.
+Three vocabularies exist for the same idea: `battles` uses 'active',
+`battle_rooms` uses waiting/active/finished, and the design doc says
+in_progress/completed/expired. Nothing in the app touches these tables yet,
+and the state machine depends on how disconnect, grace period and timeout
+are built. Adding a CHECK now would be guessing.
