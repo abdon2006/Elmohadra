@@ -150,7 +150,9 @@ GoRouter appRouter(AuthNotifier authNotifier) {
         AuthInitial() => null,
         AuthLoading() => null,
         AuthAuthenticated() =>
-          allowedWhenUnauth.contains(goingTo) ? AppRoutes.home : null,
+          allowedWhenUnauth.contains(goingTo) || goingTo == AppRoutes.splash
+              ? AppRoutes.home
+              : null,
         AuthNewUser(user: var authresult) =>
           allowedWhenUnauth.contains(goingTo)
               ? null
