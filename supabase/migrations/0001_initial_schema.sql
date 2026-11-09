@@ -380,8 +380,6 @@ revoke select on public.questions from anon;
 --     cascade, so deleting an auth account leaves the profile behind.
 --   * public.characters.key is not unique, and public.users.avatar_key is free
 --     text rather than a FK to characters.key.
---   * authenticated has no UPDATE grant on public.users, so editing the
---     profile fails with "permission denied" even though the policy allows it.
 --   * INSERT on public.users is open, so a client can set its own xp and coins
 --     at signup. Rewards must be written by the server only.
 --   * battles.status defaults to 'active' while the design uses
