@@ -2,7 +2,6 @@ import 'package:elmohadra/core/errors/app_exceptions.dart';
 import 'package:elmohadra/features/auth/data/datasources/auth_remote_data_source.dart';
 import 'package:elmohadra/features/auth/data/models/user_model.dart';
 import 'package:elmohadra/features/auth/domain/entities/auth_user_result.dart';
-import 'package:elmohadra/features/auth/domain/entities/user_entity.dart';
 import 'package:elmohadra/features/auth/domain/usecases/prams%20classes/signin_params.dart';
 import 'package:elmohadra/features/auth/domain/usecases/prams%20classes/signup_params.dart';
 import 'package:injectable/injectable.dart';
@@ -88,16 +87,7 @@ class AuthRemoteDataSourceImpl extends AuthRemoteDataSource {
           'email': params.email,
           'university': params.university,
           'academic_year': params.academicYear,
-          'level': 1,
-          'xp': 0,
-          'total_battles': 0,
-          'won_battles': 0,
-          'defeat_battles': 0,
-          'draw_battles': 0,
-          'coins': 0,
           'avatar_key': params.avatarKey,
-          'created_at': DateTime.now().toIso8601String(),
-          'status': UserStatus.active.name,
         })
         .select()
         .single();
