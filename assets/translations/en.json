@@ -17,6 +17,11 @@
   "create_one": "Create one",
   "send_reset": "Send Link",
   "save_password": "Save Password",
+  "subjects_title": "Subjects",
+  "subjects_empty": "No subjects for your year yet",
+  "subjects_error": "Could not load subjects",
+  "subjects_retry": "Try again",
+  "chapters_count": "{} chapters",
   "bottom_nav": {
     "home": "Home",
     "subjects": "Subjects",

@@ -17,6 +17,11 @@
   "create_one": "انشئ حساب",
   "send_reset": "ابعت اللينك",
   "save_password": "احفظ الباسورد",
+  "subjects_title": "المواد",
+  "subjects_empty": "مفيش مواد لسنتك لسه",
+  "subjects_error": "مش قادرين نجيب المواد",
+  "subjects_retry": "حاول تاني",
+  "chapters_count": "{} شابترز",
   "bottom_nav": {
     "home": "الرئيسية",
     "subjects": "المواد",

@@ -15,6 +15,7 @@ import 'package:elmohadra/features/auth/presentation/screens/new_password_screen
 import 'package:elmohadra/features/auth/presentation/screens/reset_password_screen.dart';
 import 'package:elmohadra/features/auth/presentation/screens/sign_in_screen.dart';
 import 'package:elmohadra/features/auth/presentation/screens/signup_screens/sign_up_screen.dart';
+import 'package:elmohadra/features/subjects/presentation/screens/subjects_screen.dart';
 import 'package:elmohadra/features/user/presentation/screens/profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -46,16 +47,7 @@ GoRouter appRouter(AuthNotifier authNotifier) {
             pageBuilder: (context, state) => buildPageTransition(
               context: context,
               state: state,
-              child: Scaffold(
-                body: Center(
-                  child: AppButton(
-                    title: 'as;fjas;fl',
-                    onTap: () {},
-                    type: AppButtonType.primary,
-                    isLoading: false,
-                  ),
-                ),
-              ),
+              child: SubjectsScreen(),
             ),
           ),
           GoRoute(

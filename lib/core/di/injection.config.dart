@@ -59,6 +59,17 @@ import '../../features/characters/domain/usecases/get_characters_usecase.dart'
     as _i951;
 import '../../features/characters/presentation/bloc/character_bloc.dart'
     as _i204;
+import '../../features/subjects/data/datasources/subject_datasource.dart'
+    as _i765;
+import '../../features/subjects/data/datasources/subject_datasource_impl.dart'
+    as _i646;
+import '../../features/subjects/data/repositories/subject_repository_impl.dart'
+    as _i74;
+import '../../features/subjects/domain/repositories/subject_repository.dart'
+    as _i425;
+import '../../features/subjects/domain/usecases/get_subjects_usecase.dart'
+    as _i464;
+import '../../features/subjects/presentation/bloc/subject_bloc.dart' as _i93;
 import '../localization/locale_cubit.dart' as _i960;
 import '../theme/theme_cubit.dart' as _i611;
 import 'register_module.dart' as _i291;
@@ -77,6 +88,11 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.factory<_i578.SignupCubit>(() => _i578.SignupCubit());
     gh.lazySingleton<_i454.SupabaseClient>(() => registerModule.supabaseClient);
+    gh.lazySingleton<_i765.SubjectDatasource>(
+      () => _i646.SubjectDatasourceImpl(
+        supabaseClient: gh<_i454.SupabaseClient>(),
+      ),
+    );
     gh.lazySingleton<_i736.CharacterDatasource>(
       () => _i47.CharacterDatasourceImpl(
         supabaseClient: gh<_i454.SupabaseClient>(),
@@ -98,6 +114,16 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i611.ThemeCubit>(
       () => _i611.ThemeCubit(gh<_i460.SharedPreferences>()),
     );
+    gh.lazySingleton<_i425.SubjectRepository>(
+      () => _i74.SubjectRepositoryImpl(
+        subjectDatasource: gh<_i765.SubjectDatasource>(),
+      ),
+    );
+    gh.factory<_i464.GetSubjectsUsecase>(
+      () => _i464.GetSubjectsUsecase(
+        subjectRepository: gh<_i425.SubjectRepository>(),
+      ),
+    );
     gh.factory<_i951.GetCharactersUsecase>(
       () => _i951.GetCharactersUsecase(
         characterRepository: gh<_i1057.CharacterRepository>(),
@@ -112,6 +138,10 @@ extension GetItInjectableX on _i174.GetIt {
       () => _i153.AuthRepositoryImpl(
         authRemoteDataSource: gh<_i107.AuthRemoteDataSource>(),
       ),
+    );
+    gh.lazySingleton<_i93.SubjectBloc>(
+      () =>
+          _i93.SubjectBloc(getSubjectsUsecase: gh<_i464.GetSubjectsUsecase>()),
     );
     gh.factory<_i216.CheckEmailIsExistUsecase>(
       () => _i216.CheckEmailIsExistUsecase(
