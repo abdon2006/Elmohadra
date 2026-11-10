@@ -3,49 +3,47 @@
 Status: agreed visually. Not built yet: it is a dashboard, so it is built last,
 once XP, battles and the boss flow produce real numbers.
 
-```
 ┌──────────────────────────────────────┐
-│  📖 الساحة                  🔔       │
-│            أنت في تجربة              │
+│ 📖 الساحة 🔔 │
+│ أنت في تجربة │
 ├──────────────────────────────────────┤
-│  [شعار]        أهلاً عبدالله!        │
-│                كلية الحاسبات · سنة 2 │
+│    [شعار]        أهلاً عبدالله!        │
+│ كلية الحاسبات · سنة 2 │
 ├──────────────────────────────────────┤
-│  المستوى 7                    🪙1,240│
-│  ████████████░░░░░░  3,200 / 5,000  │
-│  1,800 نقطة للمستوى القادم           │
+│ المستوى 7 🪙1,240│
+│ ████████████░░░░░░ 3,200 / 5,000 │
+│ 1,800 نقطة للمستوى القادم │
 ├──────────────────────────────────────┤
-│  ┌────────┬────────┬────────┐        │
-│  │   7    │   18   │   #8   │        │
-│  │ أيام   │ معارك  │ ترتيب  │        │
-│  │ متتابعة│        │ الدفعة │        │
-│  └────────┴────────┴────────┘        │
+│ ┌────────┬────────┬────────┐ │
+│ │ 7 │ 18 │ #8 │ │
+│ │ أيام │ معارك │ ترتيب │ │
+│ │ متتابعة│ │ الدفعة │ │
+│ └────────┴────────┴────────┘ │
 ├──────────────────────────────────────┤
-│  ┌────────────────────────────────┐  │
-│  │ 🔴 LIVE                        │  │
-│  │ كمّل من حيث وقفت               │  │
-│  │ هياكل البيانات · الشابتر 2     │  │
-│  │ 10 أسئلة · 5 دقائق             │  │
-│  │ +120 XP                        │  │
-│  │ ┌────────────────────────────┐ │  │
-│  │ │      ابدأ التحدي           │ │  │
-│  │ └────────────────────────────┘ │  │
-│  └────────────────────────────────┘  │
+│ ┌────────────────────────────────┐ │
+│ │ 🔴 LIVE │ │
+│ │ كمّل من حيث وقفت │ │
+│ │ هياكل البيانات · الشابتر 2 │ │
+│ │ 10 أسئلة · 5 دقائق │ │
+│ │ +120 XP │ │
+│ │ ┌────────────────────────────┐ │ │
+│ │ │ ابدأ التحدي │ │ │
+│ │ └────────────────────────────┘ │ │
+│ └────────────────────────────────┘ │
 ├──────────────────────────────────────┤
-│  كمّل مراجعتك                        │
-│  ┌────────────────────────────────┐  │
-│  │ هياكل البيانات            ›    │  │
-│  │ 2 من 4 شابترز                  │  │
-│  └────────────────────────────────┘  │
-│  ┌────────────────────────────────┐  │
-│  │ البرمجة الكائنية          ›    │  │
-│  │ 0 من 3 شابترز                  │  │
-│  └────────────────────────────────┘  │
+│ كمّل مراجعتك │
+│ ┌────────────────────────────────┐ │
+│ │ هياكل البيانات › │ │
+│ │ 2 من 4 شابترز │ │
+│ └────────────────────────────────┘ │
+│ ┌────────────────────────────────┐ │
+│ │ البرمجة الكائنية › │ │
+│ │ 0 من 3 شابترز │ │
+│ └────────────────────────────────┘ │
 ├──────────────────────────────────────┤
-│   🏠      📚     (＋)    🎒    👤   │
-│  الرئيسية المواد       المستودع      │
+│ 🏠 📚 (＋)    🎒 👤 │
+│ الرئيسية المواد المستودع │
 └──────────────────────────────────────┘
-```
 
 ## Why this shape
 
@@ -57,17 +55,17 @@ once XP, battles and the boss flow produce real numbers.
 
 ## What each block needs
 
-| Block | Source | Available |
-|---|---|---|
-| Avatar, level, coins | `users.avatar_key`, `users.level`, `users.coins` | yes |
-| XP bar | `users.xp` | yes |
-| Battles count | `users.total_battles` | yes |
-| Streak (7 أيام) | nothing exists | **no** — needs a schema decision |
-| Rank (#8) | ordering by `users.xp` | **no** — "الدفعة" is undefined |
-| Hero: current chapter | last opened file | **no** — needs tracking |
-| Hero: "5 دقائق" | `files` has no duration | **no** — needs a schema decision |
-| Hero: "+120 XP" | boss reward rule | **no** — Phase 4 |
-| "كمّل مراجعتك": "2 من 4" | `boss_attempts` per subject | **no** — Phase 4 |
+| Block                   | Source                                           | Available                        |
+|-------------------------|--------------------------------------------------|----------------------------------|
+| Avatar, level, coins    | `users.avatar_key`, `users.level`, `users.coins` | yes                              |
+| XP bar                  | `users.xp`                                       | yes                              |
+| Battles count           | `users.total_battles`                            | yes                              |
+| Streak (7 أيام)         | nothing exists                                   | **no** — needs a schema decision |
+| Rank (#8)               | ordering by `users.xp`                           | **no** — "الدفعة" is undefined   |
+| Hero: current chapter   | last opened file                                 | **no** — needs tracking          |
+| Hero: "5 دقائق"         | `files` has no duration                          | **no** — needs a schema decision |
+| Hero: "+120 XP"         | boss reward rule                                 | **no** — Phase 4                 |
+| "كمّل مراجعتك": "2 من 4" | `boss_attempts` per subject                      | **no** — Phase 4                 |
 
 ## Decided
 
@@ -89,14 +87,14 @@ once XP, battles and the boss flow produce real numbers.
 
 These all read columns that already exist; only the rules are missing.
 
-| Element | Formula |
-|---|---|
-| Win rate | `won_battles / total_battles` |
-| Full record | won / lost / drawn, straight from `users` |
-| Membership age | `now() - created_at` |
-| Average XP per battle | `xp / total_battles` |
-| Rank | ordering by `users.xp` — **scope not decided yet** |
-| XP to next level | needs the level curve and the rank badges |
+| Element               | Formula                                            |
+|-----------------------|----------------------------------------------------|
+| Win rate              | `won_battles / total_battles`                      |
+| Full record           | won / lost / drawn, straight from `users`          |
+| Membership age        | `now() - created_at`                               |
+| Average XP per battle | `xp / total_battles`                               |
+| Rank                  | ordering by `users.xp` — **scope not decided yet** |
+| XP to next level      | needs the level curve and the rank badges          |
 
 ## Open decisions
 

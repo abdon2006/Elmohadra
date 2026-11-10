@@ -11,6 +11,22 @@ Decisions that are made but not built yet.
 - Dart side: one usecase + one datasource method that invokes the function.
   Nothing else.
 
+## Explain later — embedded queries and RLS on both sides
+
+Why it matters: `subjects?select=*,bosses(count)` returns a count that is
+already filtered by the policy on `bosses`, not by the policy on `subjects`.
+When an app shows a number that came from an embed, that number is whatever
+the *child* table allowed, which is easy to misread as "the real total".
+
+Points to cover when we return to it:
+
+- How PostgREST turns a declared FK into an embed, in both directions.
+- Which RLS policy applies to each side of the embed, and what service_role
+  sees instead.
+- `count` on an empty child collection: `[]` vs `[{count: 0}]`.
+- Why an embed cannot exist without a declared FK, and what to do when there
+  is none (two queries, or a view).
+
 ## battles.status — decide in Phase 6
 
 Three vocabularies exist for the same idea: `battles` uses 'active',
