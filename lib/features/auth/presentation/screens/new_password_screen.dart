@@ -4,7 +4,7 @@ import 'package:elmohadra/core/theme/app_spacing.dart';
 import 'package:elmohadra/core/theme/app_typography.dart';
 import 'package:elmohadra/core/widgets/app_button.dart';
 import 'package:elmohadra/core/widgets/app_text_field.dart';
-import 'package:elmohadra/core/widgets/divider_with_icon.dart';
+import 'package:elmohadra/core/widgets/app_divider.dart';
 import 'package:elmohadra/features/auth/presentation/blocs/Auth%20Bloc/bloc/auth_bloc.dart';
 import 'package:elmohadra/features/auth/presentation/blocs/Auth%20Bloc/events/auth_events.dart';
 import 'package:elmohadra/features/auth/presentation/blocs/Auth%20Bloc/states/auth_states.dart';
