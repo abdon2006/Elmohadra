@@ -15,6 +15,7 @@ import 'package:elmohadra/features/auth/presentation/screens/new_password_screen
 import 'package:elmohadra/features/auth/presentation/screens/reset_password_screen.dart';
 import 'package:elmohadra/features/auth/presentation/screens/sign_in_screen.dart';
 import 'package:elmohadra/features/auth/presentation/screens/signup_screens/sign_up_screen.dart';
+import 'package:elmohadra/features/chapters/presentation/screens/chapters_screen.dart';
 import 'package:elmohadra/features/subjects/presentation/screens/subjects_screen.dart';
 import 'package:elmohadra/features/user/presentation/screens/profile_screen.dart';
 import 'package:flutter/material.dart';
@@ -49,7 +50,22 @@ GoRouter appRouter(AuthNotifier authNotifier) {
               state: state,
               child: SubjectsScreen(),
             ),
+            routes: [
+              GoRoute(
+                path: '/:subjectId/chapters',
+                name: AppRoutes.chapters,
+                pageBuilder: (context, state) {
+                  final subjectId = state.pathParameters['subjectId'];
+                  return buildPageTransition(
+                    context: context,
+                    state: state,
+                    child: ChaptersScreen(subjectId: subjectId ?? ''),
+                  );
+                },
+              ),
+            ],
           ),
+
           GoRoute(
             path: AppRoutes.vault,
             name: AppRoutes.vault,

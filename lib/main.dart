@@ -15,6 +15,7 @@ import 'package:elmohadra/core/widgets/app_toast.dart';
 import 'package:elmohadra/features/auth/presentation/blocs/Auth%20Bloc/bloc/auth_bloc.dart';
 import 'package:elmohadra/features/auth/presentation/blocs/Auth%20Bloc/events/auth_events.dart';
 import 'package:elmohadra/features/auth/presentation/blocs/Auth%20Bloc/states/auth_states.dart';
+import 'package:elmohadra/features/chapters/presentation/bloc/chapter_bloc.dart';
 import 'package:elmohadra/features/characters/presentation/bloc/character_bloc.dart';
 import 'package:elmohadra/features/subjects/presentation/bloc/subject_bloc.dart';
 import 'package:flutter/material.dart';
@@ -44,11 +45,12 @@ void main() async {
       path: 'assets/translations',
       child: MultiBlocProvider(
         providers: [
-          BlocProvider(create: (context) => getIt<LocaleCubit>()),
-          BlocProvider(create: (context) => getIt<ThemeCubit>()),
-          BlocProvider(create: (context) => getIt<AuthBloc>()),
-          BlocProvider(create: (context) => getIt<CharacterBloc>()),
-          BlocProvider(create: (context) => getIt<SubjectBloc>()),
+          BlocProvider(create: (_) => getIt<LocaleCubit>()),
+          BlocProvider(create: (_) => getIt<ThemeCubit>()),
+          BlocProvider(create: (_) => getIt<AuthBloc>()),
+          BlocProvider(create: (_) => getIt<CharacterBloc>()),
+          BlocProvider(create: (_) => getIt<SubjectBloc>()),
+          BlocProvider(create: (_) => getIt<ChapterBloc>()),
         ],
         child: ElmohadraApp(),
       ),

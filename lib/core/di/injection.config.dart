@@ -47,6 +47,17 @@ import '../../features/auth/presentation/blocs/SignUp%20Bloc/bloc/sign_up_bloc.d
     as _i128;
 import '../../features/auth/presentation/blocs/signup_cubit/signup_cubit.dart'
     as _i578;
+import '../../features/chapters/data/datasources/chapter_datasource.dart'
+    as _i418;
+import '../../features/chapters/data/datasources/chapter_datasource_impl.dart'
+    as _i874;
+import '../../features/chapters/data/repositories/chapter_repository_impl.dart'
+    as _i1006;
+import '../../features/chapters/domain/repositories/chapter_repository.dart'
+    as _i97;
+import '../../features/chapters/domain/usecases/get_chapters_usecase.dart'
+    as _i170;
+import '../../features/chapters/presentation/bloc/chapter_bloc.dart' as _i333;
 import '../../features/characters/data/datasources/character_datasource.dart'
     as _i736;
 import '../../features/characters/data/datasources/character_datasource_impl.dart'
@@ -93,6 +104,11 @@ extension GetItInjectableX on _i174.GetIt {
         supabaseClient: gh<_i454.SupabaseClient>(),
       ),
     );
+    gh.lazySingleton<_i418.ChapterDatasource>(
+      () => _i874.ChapterDatasourceImpl(
+        supabaseClient: gh<_i454.SupabaseClient>(),
+      ),
+    );
     gh.lazySingleton<_i736.CharacterDatasource>(
       () => _i47.CharacterDatasourceImpl(
         supabaseClient: gh<_i454.SupabaseClient>(),
@@ -101,6 +117,11 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i1057.CharacterRepository>(
       () => _i51.CharacterRepositoryImpl(
         characterDatasource: gh<_i736.CharacterDatasource>(),
+      ),
+    );
+    gh.lazySingleton<_i97.ChapterRepository>(
+      () => _i1006.ChapterRepositoryImpl(
+        chapterDatasource: gh<_i418.ChapterDatasource>(),
       ),
     );
     gh.lazySingleton<_i107.AuthRemoteDataSource>(
@@ -134,10 +155,19 @@ extension GetItInjectableX on _i174.GetIt {
         getCharactersUsecase: gh<_i951.GetCharactersUsecase>(),
       ),
     );
+    gh.factory<_i170.GetChaptersUsecase>(
+      () => _i170.GetChaptersUsecase(
+        chapterRepository: gh<_i97.ChapterRepository>(),
+      ),
+    );
     gh.lazySingleton<_i787.AuthRepository>(
       () => _i153.AuthRepositoryImpl(
         authRemoteDataSource: gh<_i107.AuthRemoteDataSource>(),
       ),
+    );
+    gh.lazySingleton<_i333.ChapterBloc>(
+      () =>
+          _i333.ChapterBloc(getChaptersUsecase: gh<_i170.GetChaptersUsecase>()),
     );
     gh.lazySingleton<_i93.SubjectBloc>(
       () =>
