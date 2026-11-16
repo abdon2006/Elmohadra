@@ -16,6 +16,7 @@ import 'package:elmohadra/features/auth/presentation/screens/reset_password_scre
 import 'package:elmohadra/features/auth/presentation/screens/sign_in_screen.dart';
 import 'package:elmohadra/features/auth/presentation/screens/signup_screens/sign_up_screen.dart';
 import 'package:elmohadra/features/chapters/presentation/screens/chapters_screen.dart';
+import 'package:elmohadra/features/files/presentation/screens/files_screen.dart';
 import 'package:elmohadra/features/subjects/presentation/screens/subjects_screen.dart';
 import 'package:elmohadra/features/user/presentation/screens/profile_screen.dart';
 import 'package:flutter/material.dart';
@@ -52,7 +53,7 @@ GoRouter appRouter(AuthNotifier authNotifier) {
             ),
             routes: [
               GoRoute(
-                path: '/:subjectId/chapters',
+                path: ':subjectId/chapters',
                 name: AppRoutes.chapters,
                 pageBuilder: (context, state) {
                   final subjectId = state.pathParameters['subjectId'];
@@ -62,6 +63,20 @@ GoRouter appRouter(AuthNotifier authNotifier) {
                     child: ChaptersScreen(subjectId: subjectId ?? ''),
                   );
                 },
+                routes: [
+                  GoRoute(
+                    path: ':chapterId/files',
+                    name: AppRoutes.files,
+                    pageBuilder: (context, state) {
+                      final chapterId = state.pathParameters['chapterId'];
+                      return buildPageTransition(
+                        context: context,
+                        state: state,
+                        child: FilesScreen(chapterId: chapterId ?? ''),
+                      );
+                    },
+                  ),
+                ],
               ),
             ],
           ),

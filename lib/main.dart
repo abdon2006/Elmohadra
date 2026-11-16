@@ -17,6 +17,7 @@ import 'package:elmohadra/features/auth/presentation/blocs/Auth%20Bloc/events/au
 import 'package:elmohadra/features/auth/presentation/blocs/Auth%20Bloc/states/auth_states.dart';
 import 'package:elmohadra/features/chapters/presentation/bloc/chapter_bloc.dart';
 import 'package:elmohadra/features/characters/presentation/bloc/character_bloc.dart';
+import 'package:elmohadra/features/files/presentation/bloc/file_bloc.dart';
 import 'package:elmohadra/features/subjects/presentation/bloc/subject_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -51,6 +52,7 @@ void main() async {
           BlocProvider(create: (_) => getIt<CharacterBloc>()),
           BlocProvider(create: (_) => getIt<SubjectBloc>()),
           BlocProvider(create: (_) => getIt<ChapterBloc>()),
+          BlocProvider(create: (_) => getIt<FileBloc>()),
         ],
         child: ElmohadraApp(),
       ),

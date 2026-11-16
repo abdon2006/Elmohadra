@@ -70,6 +70,15 @@ import '../../features/characters/domain/usecases/get_characters_usecase.dart'
     as _i951;
 import '../../features/characters/presentation/bloc/character_bloc.dart'
     as _i204;
+import '../../features/files/data/datasources/file_datasource.dart' as _i463;
+import '../../features/files/data/datasources/file_datasource_impl.dart'
+    as _i1002;
+import '../../features/files/data/repositories/file_repository_impl.dart'
+    as _i682;
+import '../../features/files/domain/repositories/file_repository.dart' as _i563;
+import '../../features/files/domain/usecases/get_chapter_details_usecase.dart'
+    as _i516;
+import '../../features/files/presentation/bloc/file_bloc.dart' as _i472;
 import '../../features/subjects/data/datasources/subject_datasource.dart'
     as _i765;
 import '../../features/subjects/data/datasources/subject_datasource_impl.dart'
@@ -129,6 +138,10 @@ extension GetItInjectableX on _i174.GetIt {
         supabaseClient: gh<_i454.SupabaseClient>(),
       ),
     );
+    gh.lazySingleton<_i463.FileDatasource>(
+      () =>
+          _i1002.FileDatasourceImpl(supabaseClient: gh<_i454.SupabaseClient>()),
+    );
     gh.lazySingleton<_i960.LocaleCubit>(
       () => _i960.LocaleCubit(gh<_i460.SharedPreferences>()),
     );
@@ -165,6 +178,10 @@ extension GetItInjectableX on _i174.GetIt {
         authRemoteDataSource: gh<_i107.AuthRemoteDataSource>(),
       ),
     );
+    gh.lazySingleton<_i563.FileRepository>(
+      () =>
+          _i682.FileRepositoryImpl(fileDatasource: gh<_i463.FileDatasource>()),
+    );
     gh.lazySingleton<_i333.ChapterBloc>(
       () =>
           _i333.ChapterBloc(getChaptersUsecase: gh<_i170.GetChaptersUsecase>()),
@@ -172,6 +189,11 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i93.SubjectBloc>(
       () =>
           _i93.SubjectBloc(getSubjectsUsecase: gh<_i464.GetSubjectsUsecase>()),
+    );
+    gh.factory<_i516.GetChapterDetailsUsecase>(
+      () => _i516.GetChapterDetailsUsecase(
+        fileRepository: gh<_i563.FileRepository>(),
+      ),
     );
     gh.factory<_i216.CheckEmailIsExistUsecase>(
       () => _i216.CheckEmailIsExistUsecase(
@@ -212,6 +234,11 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i397.SignupWithEmailUsecase>(
       () => _i397.SignupWithEmailUsecase(
         authRepository: gh<_i787.AuthRepository>(),
+      ),
+    );
+    gh.lazySingleton<_i472.FileBloc>(
+      () => _i472.FileBloc(
+        getChapterDetailsUsecase: gh<_i516.GetChapterDetailsUsecase>(),
       ),
     );
     gh.factory<_i519.SignInBloc>(

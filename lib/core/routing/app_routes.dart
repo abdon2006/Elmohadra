@@ -11,4 +11,5 @@ class AppRoutes {
   static const String newPass = '/newPass';
   static const String resetPass = '/resetPass';
   static const String chapters = '/subjects/:subjectId/chapters';
+  static const String files = '/subjects/:subjectId/chapters/:chapterId/files';
 }

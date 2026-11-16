@@ -1,4 +1,3 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'package:elmohadra/core/theme/app_radius.dart';
 import 'package:elmohadra/core/theme/app_spacing.dart';
 import 'package:elmohadra/core/theme/app_typography.dart';
@@ -11,6 +10,7 @@ import 'package:elmohadra/features/chapters/presentation/bloc/chapter_states.dar
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 
 class ChaptersScreen extends StatefulWidget {
   final String subjectId;
@@ -27,6 +27,8 @@ class _StateChaptersScreen extends State<ChaptersScreen> {
       GetChaptersEvent(subjectId: widget.subjectId),
     );
   }
+
+  String subjectTitle = '';
 
   @override
   void initState() {
@@ -47,7 +49,7 @@ class _StateChaptersScreen extends State<ChaptersScreen> {
             children: [
               Text(
                 textAlign: TextAlign.start,
-                'chapters_title'.tr(),
+                subjectTitle,
                 style: AppTypography.screenTitle(context),
               ),
               SizedBox(height: AppSpacing.sm.h),
@@ -56,7 +58,7 @@ class _StateChaptersScreen extends State<ChaptersScreen> {
               SizedBox(height: AppSpacing.sm.h),
 
               Expanded(
-                child: BlocBuilder<ChapterBloc, ChapterStates>(
+                child: BlocConsumer<ChapterBloc, ChapterStates>(
                   builder: (_, state) {
                     if (state is ChapterError) {
                       // TODO error state
@@ -71,7 +73,13 @@ class _StateChaptersScreen extends State<ChaptersScreen> {
                       return ListView.separated(
                         itemBuilder: (_, i) {
                           final item = state.chapters[i];
-                          return chapterCard(context: context, chapter: item);
+                          return chapterCard(
+                            context: context,
+                            chapter: item,
+                            onTap: () => context.push(
+                              '/subjects/${widget.subjectId}/chapters/${item.id}/files',
+                            ),
+                          );
                         },
                         separatorBuilder: (_, _) {
                           return SizedBox(height: AppSpacing.sm.h);
@@ -80,6 +88,13 @@ class _StateChaptersScreen extends State<ChaptersScreen> {
                       );
                     }
                     return const SizedBox.shrink();
+                  },
+                  listener: (_, state) {
+                    if (state is GetChaptersSuccess) {
+                      setState(
+                        () => subjectTitle = state.chapters[0].subjectTitle,
+                      );
+                    }
                   },
                 ),
               ),
@@ -94,16 +109,20 @@ class _StateChaptersScreen extends State<ChaptersScreen> {
 Widget chapterCard({
   required BuildContext context,
   required ChapterEntity chapter,
+  required void Function() onTap,
 }) {
   final theme = Theme.of(context).colorScheme;
-  return Container(
-    padding: EdgeInsets.all(AppSpacing.md),
-    decoration: BoxDecoration(
-      color: theme.surface,
-      borderRadius: BorderRadius.circular(AppRadius.md.r),
-    ),
-    child: Center(
-      child: Text(chapter.title, style: AppTypography.cardTitle(context)),
+  return InkWell(
+    onTap: onTap,
+    child: Container(
+      padding: EdgeInsets.all(AppSpacing.md),
+      decoration: BoxDecoration(
+        color: theme.surface,
+        borderRadius: BorderRadius.circular(AppRadius.md.r),
+      ),
+      child: Center(
+        child: Text(chapter.title, style: AppTypography.cardTitle(context)),
+      ),
     ),
   );
 }
