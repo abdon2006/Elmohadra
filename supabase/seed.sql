@@ -30,13 +30,13 @@ insert into public.bosses
 on conflict (id) do nothing;
 
 insert into public.files
-  (id, boss_id, file_title, file_source, battle_count) values
+  (id, boss_id, file_title, file_source, battle_count, sort_order) values
   ('f0000000-0000-4000-8000-000000000001',
-   'b0000000-0000-4000-8000-000000000001', 'Stacks & Queues', 'test-data', 2),
+   'b0000000-0000-4000-8000-000000000001', 'Stacks & Queues', 'test-data', 2, 1),
   ('f0000000-0000-4000-8000-000000000002',
-   'b0000000-0000-4000-8000-000000000001', 'Complexity', 'test-data', 2),
+   'b0000000-0000-4000-8000-000000000001', 'Complexity', 'test-data', 2, 2),
   ('f0000000-0000-4000-8000-000000000003',
-   'b0000000-0000-4000-8000-000000000002', 'Classes & Objects', 'test-data', 2)
+   'b0000000-0000-4000-8000-000000000002', 'Classes & Objects', 'test-data', 2, 1)
 on conflict (id) do nothing;
 
 -- choices: [{key, text}], answer = key.
