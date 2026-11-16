@@ -20,13 +20,13 @@ insert into public.subjects (id, title, academic_year, college_id) values
 on conflict (id) do nothing;
 
 insert into public.bosses
-  (id, subject_id, title, stages_count, win_condition_percentage) values
+  (id, subject_id, title, win_condition_percentage) values
   ('b0000000-0000-4000-8000-000000000001',
    '50000000-0000-4000-8000-000000000001',
-   'The Structure Keeper', 4, 80),
+   'The Structure Keeper', 80),
   ('b0000000-0000-4000-8000-000000000002',
    '50000000-0000-4000-8000-000000000002',
-   'Object Warden', 4, 80)
+   'Object Warden', 80)
 on conflict (id) do nothing;
 
 insert into public.files

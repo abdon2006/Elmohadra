@@ -27,6 +27,16 @@ Points to cover when we return to it:
 - Why an embed cannot exist without a declared FK, and what to do when there
   is none (two queries, or a view).
 
+## Boss Raid stages — decide when the boss screen is built
+
+`bosses.stages_count` was dropped in `0010`: a chapter's stages are its files
+plus one boss battle, so the number is derived, not stored.
+
+Still open: the product notes describe the Boss Raid as four stages of its own
+(Knowledge, Application, Bug Hunt, Final Mastery). Those four stages have to
+live somewhere — either inside the single boss battle, or the chapter model
+changes. Nothing on the chapter screen depends on the answer.
+
 ## battles.status — decide in Phase 6
 
 Three vocabularies exist for the same idea: `battles` uses 'active',
