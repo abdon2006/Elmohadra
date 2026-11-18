@@ -14,9 +14,18 @@ class ChapterDatasourceImpl extends ChapterDatasource {
   Future<List<ChapterEntity>> getChapters(String subjectId) async {
     final res = await supabaseClient
         .from('bosses')
-        .select('*,files(count),subjects(title)')
+        .select(
+          '*,files(id,file_title,user_file_progress(user_id)),subjects(title)',
+        )
         .eq('subject_id', subjectId)
-        .order('sort_order');
-    return res.map((c) => ChapterModel.fromJson(c)).toList();
+        .order('sort_order')
+        .order('sort_order', referencedTable: 'files');
+
+    // tear off
+    final chapters = res.map(ChapterModel.fromJson).toList();
+    return [
+      ...chapters.where((chapter) => !chapter.isFinal),
+      ...chapters.where((chapter) => chapter.isFinal),
+    ];
   }
 }

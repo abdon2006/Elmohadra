@@ -6,17 +6,25 @@ class ChapterModel extends ChapterEntity {
     required super.title,
     required super.filesCount,
     required super.subjectTitle,
+    required super.completedFiles,
+    required super.isFinal,
   });
 
   factory ChapterModel.fromJson(Map<String, dynamic> json) {
-    final files = json['files'] as List<dynamic>?;
+    final files = json['files'] as List<dynamic>? ?? [];
+    int completedFiles = 0;
+    for (var file in files) {
+      if ((file['user_file_progress'] as List? ?? []).isNotEmpty) {
+        completedFiles++;
+      }
+    }
     return ChapterModel(
       id: json['id'] as String,
       title: json['title'] as String,
-      filesCount: files == null || files.isEmpty
-          ? 0
-          : files.first['count'] as int,
-      subjectTitle: json['subjects']?['title'] as String,
+      filesCount: files.length,
+      subjectTitle: json['subjects']?['title'] as String? ?? '',
+      completedFiles: completedFiles,
+      isFinal: json['kind'] == 'final',
     );
   }
 }
