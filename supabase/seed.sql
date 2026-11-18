@@ -20,13 +20,21 @@ insert into public.subjects (id, title, academic_year, college_id) values
 on conflict (id) do nothing;
 
 insert into public.bosses
-  (id, subject_id, title, win_condition_percentage) values
+  (id, subject_id, title, kind, win_condition_percentage, sort_order) values
   ('b0000000-0000-4000-8000-000000000001',
    '50000000-0000-4000-8000-000000000001',
-   'The Structure Keeper', 80),
+   'The Structure Keeper', 'chapter', 80, 1),
   ('b0000000-0000-4000-8000-000000000002',
    '50000000-0000-4000-8000-000000000002',
-   'Object Warden', 80)
+   'Object Warden', 'chapter', 80, 1),
+  ('b0000000-0000-4000-8000-000000000003',
+   '50000000-0000-4000-8000-000000000001',
+   'Hash Keeper', 'chapter', 80, 3),
+  -- The subject-wide challenge. Not a chapter: it exists so the final fight has
+  -- questions to draw from, and its file is never shown as a battle.
+  ('b0000000-0000-4000-8000-000000000004',
+   '50000000-0000-4000-8000-000000000001',
+   'The Final Guardian', 'final', 80, 4)
 on conflict (id) do nothing;
 
 insert into public.files
@@ -36,7 +44,11 @@ insert into public.files
   ('f0000000-0000-4000-8000-000000000002',
    'b0000000-0000-4000-8000-000000000001', 'Complexity', 'test-data', 2, 2),
   ('f0000000-0000-4000-8000-000000000003',
-   'b0000000-0000-4000-8000-000000000002', 'Classes & Objects', 'test-data', 2, 1)
+   'b0000000-0000-4000-8000-000000000002', 'Classes & Objects', 'test-data', 2, 1),
+  -- Question bank of the final challenge: battle_count 0, it is never played
+  -- as a file and never counts towards a subject's progress.
+  ('f0000000-0000-4000-8000-000000000004',
+   'b0000000-0000-4000-8000-000000000004', 'بنك أسئلة الشاملة', 'test-data', 0, 1)
 on conflict (id) do nothing;
 
 -- choices: [{key, text}], answer = key.
@@ -91,7 +103,21 @@ insert into public.file_questions (id, file_id, question_id, "order") values
    'a0000000-0000-4000-8000-000000000005', 1),
   ('e0000000-0000-4000-8000-000000000006',
    'f0000000-0000-4000-8000-000000000003',
-   'a0000000-0000-4000-8000-000000000006', 2)
+   'a0000000-0000-4000-8000-000000000006', 2),
+  -- The same questions again: one question may sit in more than one file, which
+  -- is how the final challenge covers the whole subject without new content.
+  ('e0000000-0000-4000-8000-000000000007',
+   'f0000000-0000-4000-8000-000000000004',
+   'a0000000-0000-4000-8000-000000000001', 1),
+  ('e0000000-0000-4000-8000-000000000008',
+   'f0000000-0000-4000-8000-000000000004',
+   'a0000000-0000-4000-8000-000000000002', 2),
+  ('e0000000-0000-4000-8000-000000000009',
+   'f0000000-0000-4000-8000-000000000004',
+   'a0000000-0000-4000-8000-000000000003', 3),
+  ('e0000000-0000-4000-8000-000000000010',
+   'f0000000-0000-4000-8000-000000000004',
+   'a0000000-0000-4000-8000-000000000004', 4)
 on conflict (id) do nothing;
 
 -- ---------------------------------------------------------------------------
