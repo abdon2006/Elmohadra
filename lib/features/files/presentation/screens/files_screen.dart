@@ -1,6 +1,6 @@
 import 'package:elmohadra/core/theme/app_spacing.dart';
-import 'package:elmohadra/core/theme/app_typography.dart';
 import 'package:elmohadra/core/widgets/app_divider.dart';
+import 'package:elmohadra/core/widgets/app_page_header.dart';
 import 'package:elmohadra/features/files/presentation/bloc/file_bloc.dart';
 import 'package:elmohadra/features/files/presentation/bloc/file_event.dart';
 import 'package:elmohadra/features/files/presentation/bloc/file_states.dart';
@@ -37,8 +37,9 @@ class _FilesScreenState extends State<FilesScreen> {
           padding: EdgeInsetsGeometry.symmetric(horizontal: AppSpacing.md.w),
           child: Column(
             children: [
-              Text(chapterTitle, style: AppTypography.screenTitle(context)),
-              Text(subjectTitle, style: AppTypography.screenTitle(context)),
+              // Text(chapterTitle, style: AppTypography.screenTitle(context)),
+              // Text(subjectTitle, style: AppTypography.screenTitle(context)),
+              AppPageHeader(title: chapterTitle),
               SizedBox(height: AppSpacing.sm.h),
               appDivider(isDark: isDark),
               SizedBox(height: AppSpacing.sm.h),
