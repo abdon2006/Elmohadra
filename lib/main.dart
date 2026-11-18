@@ -11,6 +11,7 @@ import 'package:elmohadra/core/routing/auth_notifier.dart';
 import 'package:elmohadra/core/supabase/supabase_config.dart';
 import 'package:elmohadra/core/theme/app_theme.dart';
 import 'package:elmohadra/core/theme/theme_cubit.dart';
+import 'package:elmohadra/core/widgets/app_background.dart';
 import 'package:elmohadra/core/widgets/app_toast.dart';
 import 'package:elmohadra/features/auth/presentation/blocs/Auth%20Bloc/bloc/auth_bloc.dart';
 import 'package:elmohadra/features/auth/presentation/blocs/Auth%20Bloc/events/auth_events.dart';
@@ -165,7 +166,7 @@ class _ElmohadraAppState extends State<ElmohadraApp> {
                   );
                 }
               },
-              child: child ?? const SizedBox.shrink(),
+              child: AppBackground(child: child ?? const SizedBox.shrink()),
             ),
           ),
         );
