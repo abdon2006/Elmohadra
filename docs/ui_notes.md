@@ -41,6 +41,11 @@
 - المسافات بتتحسب مرتين: `AppSpacing.md` lowercase → `EdgeInsets.all(AppSpacing.md)` بدون `.w/.h`،
   و`AppRadius.md.r` جوه `circular` — محتاج مراجعة عشان الارقام تفضل موحدة.
 
+## MainShell — الفاب
+
+- لما الكيبورد يفتح، الفاب بيختفي. الظهور/الاختفاء نفسه مش عاجب — محتاج أنيميشن أنضف (أو fade/scale بدل ما يظهر ويختفي
+  فجأة).
+
 ## SubjectsScreen
 
 - الكارت شكله تقليدي

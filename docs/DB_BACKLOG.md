@@ -2,6 +2,29 @@
 
 Decisions that are made but not built yet.
 
+## subjects.college_id — HIGH PRIORITY, blocks multi-college
+
+`subjects` already carries `college_id`, but `users` does not carry the same
+value in Dart: `UserEntity` only has `university` (a free-text name). So the
+subjects query filters on `academic_year` alone, and a subject from another
+college with the same year would show up.
+
+The moment a second college enters the data this is wrong, not just imprecise.
+It is deferred only because the MVP is single-college.
+
+What it needs, in order:
+
+1. `users.college_id` (uuid, FK → `colleges.id`) — schema change, new
+   migration, backfill for existing rows.
+2. `college_id` on the user entity, mapped from that column.
+3. `GetSubjectsParams.collegeId` — the params object is already in place, so
+   this is one field.
+4. `.match({'academic_year': ..., 'college_id': ...})` in the subjects
+   datasource — one key added to the map.
+
+Deliberately NOT added as `String?` today: a parameter that is always null is
+dead code, and the next reader has to guess who was supposed to fill it.
+
 ## Account deletion — waiting on the profile screen
 
 - An Edge Function `delete-account` runs with `service_role` and does two
