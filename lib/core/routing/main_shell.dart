@@ -1,12 +1,13 @@
 import 'package:elmohadra/core/routing/app_routes.dart';
+import 'package:elmohadra/core/widgets/app_bottom_nav.dart';
 import 'package:elmohadra/core/widgets/app_fab.dart';
 import 'package:flutter/material.dart';
-import 'package:elmohadra/core/widgets/app_bottom_nav.dart';
 import 'package:go_router/go_router.dart';
 
 class MainShell extends StatelessWidget {
   final Widget child;
   final GoRouterState state;
+
   const MainShell({super.key, required this.child, required this.state});
 
   @override
@@ -22,11 +23,10 @@ class MainShell extends StatelessWidget {
     };
     return Scaffold(
       body: child,
+      floatingActionButton: MediaQuery.viewInsetsOf(context).bottom > 0
+          ? null
+          : AppFab(),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: 
-      
-      AppFab()
-      ,
       bottomNavigationBar: AppBottomNav(
         currentIndex: currentIndex,
         onTap: (index) {

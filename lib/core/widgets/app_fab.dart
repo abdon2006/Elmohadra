@@ -15,7 +15,7 @@ class _AppFabState extends State<AppFab> {
   Widget build(BuildContext context) {
     return Material(
       color: AppColors.accent,
-      elevation: 8,
+      elevation: 3,
       shadowColor: AppColors.accent.withValues(alpha: 0.5),
       shape: const CircleBorder(),
       clipBehavior: Clip.antiAlias,
