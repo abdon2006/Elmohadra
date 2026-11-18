@@ -6,12 +6,19 @@ import 'package:elmohadra/features/subjects/domain/repositories/subject_reposito
 import 'package:injectable/injectable.dart';
 
 @injectable
-class GetSubjectsUsecase extends BaseUsecase<List<SubjectEntity>, int> {
+class GetSubjectsUsecase
+    extends BaseUsecase<List<SubjectEntity>, GetSubjectsParams> {
   final SubjectRepository subjectRepository;
 
   GetSubjectsUsecase({required this.subjectRepository});
 
   @override
-  Future<Either<Failure, List<SubjectEntity>>> call(int year) =>
-      subjectRepository.getSubjects(year);
+  Future<Either<Failure, List<SubjectEntity>>> call(GetSubjectsParams params) =>
+      subjectRepository.getSubjects(params);
+}
+
+class GetSubjectsParams {
+  final int year;
+
+  const GetSubjectsParams({required this.year});
 }

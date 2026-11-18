@@ -1,5 +1,6 @@
-import 'package:elmohadra/features/subjects/data/models/subject_model.dart';
+import 'package:elmohadra/features/subjects/domain/entities/subject_entity.dart';
+import 'package:elmohadra/features/subjects/domain/usecases/get_subjects_usecase.dart';
 
 abstract class SubjectDatasource {
-  Future<List<SubjectModel>> getSubjects(int year);
+  Future<List<SubjectEntity>> getSubjects(GetSubjectsParams params);
 }

@@ -4,7 +4,7 @@ import 'package:elmohadra/features/subjects/presentation/bloc/subject_states.dar
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 
-@lazySingleton
+@injectable
 class SubjectBloc extends Bloc<SubjectEvents, SubjectStates> {
   final GetSubjectsUsecase getSubjectsUsecase;
 
@@ -12,7 +12,7 @@ class SubjectBloc extends Bloc<SubjectEvents, SubjectStates> {
     on<GetSubjectsEvent>((event, emit) async {
       emit(SubjectLoading());
 
-      final res = await getSubjectsUsecase(event.academicYear);
+      final res = await getSubjectsUsecase(event.params);
       res.fold(
         (l) => emit(SubjectError(failure: l)),
         (r) => emit(SubjectsLoaded(subjects: r)),

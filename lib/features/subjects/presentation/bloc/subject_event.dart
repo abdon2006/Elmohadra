@@ -1,7 +1,9 @@
+import 'package:elmohadra/features/subjects/domain/usecases/get_subjects_usecase.dart';
+
 abstract class SubjectEvents {}
 
 class GetSubjectsEvent extends SubjectEvents {
-  final int academicYear;
+  final GetSubjectsParams params;
 
-  GetSubjectsEvent({required this.academicYear});
+  GetSubjectsEvent({required this.params});
 }
